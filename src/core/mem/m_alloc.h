@@ -2,10 +2,7 @@
 #define _m_alloc_h
 
 #include "../../utils/u_def.h"
-
-#define KB(x) x * 1024
-#define MB(x) KB(x) * 1024
-#define GB(x) MB(x) * 1024
+#include "m_utils.h"
 
 #define TEMP_HEAP KB(128)
 #define GLOB_HEAP MB(12)

@@ -15,6 +15,7 @@ target_sources(cl_main PRIVATE
     ./core/file/f_conf.c
     ./lib/cbmp/cbmp.c
     ./core/mem/m_alloc.c
+    ./core/mem/m_utils.c
     ./core/sys.c
 )
 
