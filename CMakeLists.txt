@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 project(HaltyraEngine)
 
 add_compile_options(-g)
+add_compile_options(-Wall)
+add_compile_options(-Wextra)
+add_compile_options(-std=c23)
 
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
