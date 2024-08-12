@@ -46,3 +46,13 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
 else()
     target_sources(cl_main PRIVATE ./src/render/draw/r_draw.c)
 endif()
+
+# tests
+add_executable(t_mem ./src/core/mem/t_mem.c)
+
+target_sources(t_mem PRIVATE
+    ./src/core/mem/m_alloc.c
+    ./src/core/sys.c
+)
+
+add_test(NAME MemoryManagerTest COMMAND t_mem)
