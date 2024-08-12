@@ -8,8 +8,6 @@ add_compile_options(-Wextra)
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 
-enable_language(ASM)
-
 # cl_main executable
 add_executable(cl_main ./src/cl_main.c)
 
