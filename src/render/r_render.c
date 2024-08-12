@@ -5,6 +5,17 @@ extern state_t g_cState;
 extern vidstate_t g_cVidstate;
 extern playerstate_t g_cPlayerstate;
 
+void R_Init(void) {
+    texture_t* tex = &g_cRenderstate.textures[0];
+    tex->size = (v2i) { 32, 32 };
+    T_AllocTexture(tex);
+    T_GenDebugTexture(tex);
+}
+
+void R_Free(void) {
+    T_FreeTexture(&g_cRenderstate.textures[0]);
+}
+
 // rotate vector v by angle a
 static inline v2 R_Rotate(v2 v, f32 a) {
     return (v2) {
@@ -268,21 +279,11 @@ void R_Render() {
                     g_cState.y_lo[x] = clamp(max(max(yf, nyf), g_cState.y_lo[x]), 0, SCREEN_HEIGHT - 1);
                 }
                 else {
-                    // textured_verline(
-                    //     x, yf, yc,
-                    //     yf, yc, u_a, state.debug_texture);
-
                     D_VertLine(
                         yf,
                         yc,
                         x,
                         R_AbgrMul(0xFFFFFFFF, shade));
-
-                    // D_TextLine(
-                    //     yf,
-                    //     yc,
-                    //     x,
-                    //     0);
                 }
 
                 if (g_cState.sleepy) {
@@ -303,15 +304,4 @@ void R_Render() {
     }
 
     g_cState.sleepy = false;
-}
-
-void R_Init(void) {
-    texture_t* tex = &g_cRenderstate.textures[0];
-    tex->size = (v2i) { 32, 32 };
-    T_AllocTexture(tex);
-    T_GenDebugTexture(tex);
-}
-
-void R_Free(void) {
-    T_FreeTexture(&g_cRenderstate.textures[0]);
 }
