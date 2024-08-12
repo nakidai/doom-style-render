@@ -53,7 +53,9 @@ void M_Init(void) {
     else                       temp_size = M_ReadMemSize(temp_size_str);
 
     // memory allocation
+    printf("M_Init: alloc glob heap\n");
     glob_mem = malloc(glob_size);
+    printf("M_Init: alloc temp heap\n");
     temp_mem = malloc(temp_size);
 
     // clearing memory buffers
@@ -69,7 +71,9 @@ void M_Init(void) {
 // freeing up memory
 void M_Free(void) {
 #   ifndef STD_ALLOC
+    printf("M_Free: free glob heap\n");
     free(glob_mem);
+    printf("M_Init: free temp heap\n");
     free(temp_mem);
 #   endif
 }

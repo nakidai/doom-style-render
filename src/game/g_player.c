@@ -27,14 +27,14 @@ static void G_PlayerHandleKeys(void) {
     g_cPlayerstate.camera.anglecos = cos(g_cPlayerstate.camera.angle);
     g_cPlayerstate.camera.anglesin = sin(g_cPlayerstate.camera.angle);
 
-    if (keystate[SDLK_w & 0xFFFF]) {
+    if (keystate[SDLK_UP & 0xFFFF]) {
         g_cPlayerstate.camera.pos = (v2){
             g_cPlayerstate.camera.pos.x + (move_speed * g_cPlayerstate.camera.anglecos),
             g_cPlayerstate.camera.pos.y + (move_speed * g_cPlayerstate.camera.anglesin),
         };
     }
 
-    if (keystate[SDLK_s & 0xFFFF]) {
+    if (keystate[SDLK_DOWN & 0xFFFF]) {
         g_cPlayerstate.camera.pos = (v2){
             g_cPlayerstate.camera.pos.x - (move_speed * g_cPlayerstate.camera.anglecos),
             g_cPlayerstate.camera.pos.y - (move_speed * g_cPlayerstate.camera.anglesin),

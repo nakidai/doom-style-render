@@ -1,11 +1,5 @@
 #include "../../cl_def.h"
 
-#ifdef DEBUG_PRINT_INIT
-#define PRINT(...) ({ printf(__VA_ARGS__); })
-#else
-#define PRINT(...)
-#endif
-
 u16 W_Read2Bytes(const u8* data, int offset) {
     u16 value;
     memcpy(&value, data + offset, sizeof(u16));
@@ -77,18 +71,12 @@ static void W_ReadDirectory(const u8* data, int offset, wad_directory_t* directo
 }
 
 void W_LoadWAD(wad_t* wad) {
-    PRINT("W_LoadWAD: reading WAD file\n");
+    printf("W_LoadWAD: reading WAD file\n");
     W_ReadWAD(wad);
 
-    PRINT("W_LoadWAD: reading header\n");
     W_ReadHeader(wad->data, &wad->header);
     W_CheckHeader(wad->header);
 
-    PRINT("W_LoadWAD: header: type: %s\n", wad->header.WADtype);
-    PRINT("W_LoadWAD: header: dir_count: %i\n", wad->header.dir_count);
-    PRINT("W_LoadWAD: header: dir_offset: %i\n", wad->header.dir_offset);
-
-    PRINT("W_LoadWAD: reading directories\n");
     for (u32 i = 0; i < wad->header.dir_count; i++) {
         wad_directory_t dir = {};
 
@@ -98,14 +86,8 @@ void W_LoadWAD(wad_t* wad) {
             &dir
         );
 
-        PRINT("W_ReadWADDirectory: reading directory %s\n", dir.lump_name);
-        PRINT("W_ReadWADDirectory: offset: %i\n", dir.lump_offset);
-        PRINT("W_ReadWADDirectory: size: %i\n", dir.lump_size);
-
         wad->dirs[i] = dir;
     }
-
-    PRINT("W_LoadWAD: done reading\n");
 }
 
 void W_CloseWAD(wad_t* wad) {
@@ -125,10 +107,6 @@ wad_directory_t W_FindDirectory(wad_t* wad, const char* name) {
 }
 
 void W_ReadWADDirectory(const wad_t* wad, const wad_directory_t directory, u8* buffer) {
-    PRINT("W_ReadWADDirectory: reading directory %s\n", directory.lump_name);
-    PRINT("W_ReadWADDirectory: offset: %i\n", directory.lump_offset);
-    PRINT("W_ReadWADDirectory: size: %i\n", directory.lump_size);
-
     memcpy(buffer, wad->data + directory.lump_offset, directory.lump_size);
 }
 
