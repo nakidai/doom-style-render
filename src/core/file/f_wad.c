@@ -13,7 +13,7 @@ u32 W_Read4Bytes(const u8* data, int offset) {
 }
 
 static inline const char* W_FindWadPath(void) {
-    return "../res/test.wad";
+    return "./../../res/test.wad";
 }
 
 static void W_ReadWAD(wad_t* wad) {
