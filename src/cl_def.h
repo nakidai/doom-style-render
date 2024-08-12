@@ -16,5 +16,6 @@
 #include "render/draw/r_draw.h"
 #include "core/sys.h"
 #include "utils/u_state.h"
+#include "utils/math/u_math.h"
 
 #endif

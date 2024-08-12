@@ -16,68 +16,6 @@ void R_Free(void) {
     T_FreeTexture(&g_cRenderstate.textures[0]);
 }
 
-// rotate vector v by angle a
-static inline v2 R_Rotate(v2 v, f32 a) {
-    return (v2) {
-        (v.x * cos(a)) - (v.y * sin(a)),
-            (v.x * sin(a)) + (v.y * cos(a)),
-    };
-}
-
-// see: https://en.wikipedia.org/wiki/Line–line_intersection
-// compute intersection of two line segments, returns (NAN, NAN) if there is
-// no intersection.
-static inline v2 R_IntersectSegs(v2 a0, v2 a1, v2 b0, v2 b1) {
-    const f32 d =
-        ((a0.x - a1.x) * (b0.y - b1.y))
-        - ((a0.y - a1.y) * (b0.x - b1.x));
-
-    if (fabsf(d) < 0.000001f) { return (v2) { NAN, NAN }; }
-
-    const f32
-        t = (((a0.x - b0.x) * (b0.y - b1.y))
-            - ((a0.y - b0.y) * (b0.x - b1.x))) / d,
-        u = (((a0.x - b0.x) * (a0.y - a1.y))
-            - ((a0.y - b0.y) * (a0.x - a1.x))) / d;
-    return (t >= 0 && t <= 1 && u >= 0 && u <= 1) ?
-        ((v2) {
-        a0.x + (t * (a1.x - a0.x)),
-            a0.y + (t * (a1.y - a0.y))
-    })
-        : ((v2) {
-        NAN, NAN
-    });
-}
-
-static inline u32 R_AbgrMul(u32 col, u32 a) {
-    const u32
-        br = ((col & 0xFF00FF) * a) >> 8,
-        g = ((col & 0x00FF00) * a) >> 8;
-
-    return 0xFF000000 | (br & 0xFF00FF) | (g & 0x00FF00);
-}
-
-// convert angle in [-(HFOV / 2)..+(HFOV / 2)] to X coordinate
-static inline int R_ScreenAngleToX(f32 angle) {
-    return
-        ((int)(SCREEN_WIDTH / 2))
-        * (1.0f - tan(((angle + (HFOV / 2.0)) / HFOV) * PI_2 - PI_4));
-}
-
-// noramlize angle to +/-PI
-static inline f32 R_NormalizeAngle(f32 a) {
-    return a - (TAU * floor((a + PI) / TAU));
-}
-
-// world space -> camera space (translate and rotate)
-static inline v2 R_WorldPosToCamera(v2 p) {
-    const v2 u = { p.x - g_cPlayerstate.camera.pos.x, p.y - g_cPlayerstate.camera.pos.y };
-    return (v2) {
-        u.x* g_cPlayerstate.camera.anglesin - u.y * g_cPlayerstate.camera.anglecos,
-            u.x* g_cPlayerstate.camera.anglecos + u.y * g_cPlayerstate.camera.anglesin,
-    };
-}
-
 void R_Render() {
     for (int i = 0; i < SCREEN_WIDTH; i++) {
         g_cState.y_hi[i] = SCREEN_HEIGHT - 1;

@@ -17,6 +17,7 @@ target_sources(cl_main PRIVATE
     ./core/mem/m_alloc.c
     ./core/mem/m_utils.c
     ./core/sys.c
+    ./utils/math/u_math.c
 )
 
 if(WIN32)
@@ -37,6 +38,9 @@ endif()
 # Assembly code only for x86-64
 if ((CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)") AND WIN32)
     target_sources(cl_main PRIVATE ./render/draw/asm/x86/win/win_x86_64.s)
+    # target_sources(cl_main PRIVATE ./utils/math/asm/x86/win/win_x86_64.s)
+    target_sources(cl_main PRIVATE ./utils/math/asm/c_impl.c) # TODO: fix asebmler implementation
 else()
     target_sources(cl_main PRIVATE ./render/draw/r_draw.c)
+    target_sources(cl_main PRIVATE ./utils/math/asm/c_impl.c)
 endif()

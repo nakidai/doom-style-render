@@ -2,6 +2,7 @@
 #define _g_map_h
 
 #include "../utils/u_def.h"
+#include "../utils/math/u_math.h"
 
 typedef struct {
     v2i a, b;
