@@ -37,13 +37,3 @@
             .Exit: # exit from loop
 
             ret
-
-    .globl ASMD_TextLine
-        ASMD_TextLine: # ASMD_TextLine(int y0, int y1, int x, int u, int v)
-            push rbp
-
-            mov rbp, rsp
-            
-
-            pop rbp
-            ret
