@@ -1,6 +1,6 @@
 all:
-	cmake -G "MinGW Makefiles" -S . -B ./build
-	make -C ./build
+	cmake -S . -B ./build
+	cmake --build build
 
 main: all
 	./build/cl_main.exe

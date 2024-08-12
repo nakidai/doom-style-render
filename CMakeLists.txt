@@ -6,32 +6,43 @@ add_compile_options(-g)
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 
-enable_language(C ASM)
+enable_language(ASM)
 
-set(SOURCE ./src/render/r_render.c
-           ./src/render/utils/r_texture.c
-           ./src/render/draw/asm/r_draw.s
-           ./src/render/draw/r_draw.c
-           ./src/game/g_player.c
-           ./src/game/g_map.c
-           ./src/core/v_vid.c
-           ./src/core/file/f_wad.c
-           ./src/core/file/f_conf.c
-           ./src/lib/cbmp/cbmp.c
-           ./src/core/mem/m_alloc.c
-           ./src/core/sys.c)
+add_executable(cl_main ./src/cl_main.c)
+target_link_libraries(cl_main ${SDL2_LIBRARIES})
 
-set(SYSTEM_LIBS winmm.lib
-                imm32.lib
-                ole32.lib
-                Setupapi.lib
-                gdi32.lib
-                version.lib)
+target_sources(cl_main PRIVATE
+    ./src/render/r_render.c
+    ./src/render/utils/r_texture.c
+    ./src/render/draw/r_draw.c
+    ./src/game/g_player.c
+    ./src/game/g_map.c
+    ./src/core/v_vid.c
+    ./src/core/file/f_wad.c
+    ./src/core/file/f_conf.c
+    ./src/lib/cbmp/cbmp.c
+    ./src/core/mem/m_alloc.c
+    ./src/core/sys.c
+)
 
-set(SOURCE_MAIN ./src/cl_main.c ${SOURCE})
+if(WIN32)
+    target_link_libraries(cl_main
+        winmm.lib
+        imm32.lib
+        ole32.lib
+        Setupapi.lib
+        gdi32.lib
+        version.lib
+    )
+endif()
 
-add_executable(cl_main ${SOURCE_MAIN})
+if(UNIX)
+    target_link_libraries(cl_main m)
+endif()
 
-target_link_libraries(cl_main
-                      ${SDL2_LIBRARIES}
-                      ${SYSTEM_LIBS})
+# Assembly code only for x86-64
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
+    target_sources(cl_main PRIVATE ./src/render/draw/asm/x86_r_draw.s)
+else()
+    target_sources(cl_main PRIVATE ./src/render/draw/asm/arm64_r_draw.s)
+endif()

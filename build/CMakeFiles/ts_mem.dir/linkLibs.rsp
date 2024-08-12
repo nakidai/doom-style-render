@@ -1,1 +1,0 @@
- "C:/Users/glebm/CmakeProj/SDL2-2.30.6/x86_64-w64-mingw32/lib/libSDL2.a" "C:/Users/glebm/CmakeProj/SDL2-2.30.6/x86_64-w64-mingw32/lib/libSDL2main.a" -lwinmm -limm32 -lole32 -lSetupapi -lgdi32 -lversion -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 
