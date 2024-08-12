@@ -19,8 +19,6 @@ static void CL_Init(int argc, char** argv) {
     V_Init();
     R_Init();
     G_InitPlayer();
-
-    M_Debug();
 }
 
 static void CL_CheckWindowEvents(void) {
