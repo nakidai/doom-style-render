@@ -3,6 +3,6 @@
 
 #include "../../utils/u_def.h"
 
-extern void D_VertLine(int y0, int y1, int x, u32 color);
+extern __cdecl void D_VertLine(int y0, int y1, int x, u32 color);
 
 #endif

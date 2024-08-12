@@ -30,7 +30,7 @@ int R_ScreenAngleToX(f32 angle);
 v2 R_WorldPosToCamera(v2 p);
 v2 R_Rotate(v2 v, f32 a);
 
-extern u32 R_AbgrMul(u32 col, u32 a);
-extern f32 R_NormalizeAngle(f32 a);
+extern __cdecl u32 R_AbgrMul(u32 col, u32 a);
+extern __cdecl f32 R_NormalizeAngle(f32 a);
 
 #endif
