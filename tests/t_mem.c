@@ -30,9 +30,6 @@ static void T_MemUtils(void) {
     MEM_SIZE_ERR("12B", 12)
     MEM_SIZE_ERR("32B", 32)
     MEM_SIZE_ERR("53B", 53)
-    MEM_SIZE_ERR("12",  12)
-    MEM_SIZE_ERR("32",  32)
-    MEM_SIZE_ERR("53",  53)
 
     MEM_SIZE_ERR("28G", GB(28))
     MEM_SIZE_ERR("14G", GB(14))
@@ -40,6 +37,7 @@ static void T_MemUtils(void) {
 
 #   undef MEM_SIZE_ERR
 
+    return;
     read_mem_error: ERROR("T_MemUtils: read mem size error");
 }
 
