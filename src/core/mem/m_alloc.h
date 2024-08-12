@@ -20,6 +20,9 @@ void M_Init(void);
 void M_Free(void);
 void M_Debug(void);
 
+void* M_TryGlobAlloc(usize size);
+void* M_TryTempAlloc(usize size);
+
 void* M_GlobAlloc(usize size);
 void* M_TempAlloc(usize size);
 

@@ -95,8 +95,8 @@ void M_Debug(void) {
 static void  M_Check(void* buf);
 static void* M_BufAlloc(void* buf, usize size, usize buf_size);
 
-// allocate memory to global buffer
-void* M_GlobAlloc(usize size) {
+// allocate memory in global buffer (an error return NULL)
+void* M_TryGlobAlloc(usize size) {
 #   ifndef SDL_ALLOC
     void* addr = M_BufAlloc(glob_mem, size, glob_size); // allocate memory
 #   ifdef PARANOID
@@ -109,8 +109,8 @@ void* M_GlobAlloc(usize size) {
 #   endif
 }
 
-// allocate memory to temp buffer
-void* M_TempAlloc(usize size) {
+// allocate memory in temp buffer (an error return NULL)
+void* M_TryTempAlloc(usize size) {
 #   ifndef STD_ALLOC
     void* addr = M_BufAlloc(temp_mem, size, temp_size); // allocate memory
 #   ifdef PARANOID
@@ -121,6 +121,20 @@ void* M_TempAlloc(usize size) {
 #   else
     return malloc(size);
 #   endif
+}
+
+// allocate memory to global buffer
+void* M_GlobAlloc(usize size) {
+    void* addr = M_TryGlobAlloc(size);
+    if (addr == NULL) M_ERROR("M_GlobAlloc: can't alloc");
+    return addr;
+}
+
+// allocate memory to temp buffer
+void* M_TempAlloc(usize size) {
+    void* addr = M_TryTempAlloc(size);
+    if (addr == NULL) M_ERROR("M_TempAlloc: can't alloc");
+    return addr;
 }
 
 static void M_BufFree(void* ptr);
@@ -313,7 +327,7 @@ static void* M_BufAlloc(void* buf, usize size, usize buf_size) {
     }
 
     done:
-        if (addr == NULL) M_ERROR("M_BufAlloc: can't alloc"); // if addr is NULL then an error occurred
+        // if (addr == NULL) M_ERROR("M_BufAlloc: can't alloc"); // if addr is NULL then an error occurred
         return addr;
 }
 
