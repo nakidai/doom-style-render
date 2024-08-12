@@ -1,0 +1,23 @@
+name: C Unit Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  tests:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: install SDL
+      run: sudo apt install libsdl2-dev libsdl2-2.0-0 -y
+    - name: cmake gen
+      run: cmake -S . -B build
+    - name: build
+      run: cmake --build build/
+    - name: run tests
+      run: cd build && ctest
