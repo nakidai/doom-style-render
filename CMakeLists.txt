@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(HaltyraEngine)
+project(HaltyraEngine C ASM)
 
 add_compile_options(-g)
 add_compile_options(-Wall)
@@ -7,8 +7,6 @@ add_compile_options(-Wextra)
 
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
-
-enable_language(ASM)
 
 add_executable(cl_main ./src/cl_main.c)
 target_link_libraries(cl_main ${SDL2_LIBRARIES})
