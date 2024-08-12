@@ -4,7 +4,13 @@ extern vidstate_t g_cVidstate;
 extern render_state_t g_cRenderstate;
 
 void D_VertLine(int y0, int y1, int x, u32 color) {
+#   ifndef ASM_TO_C
     ASMD_VertLine(y0, y1, x, color);
+#   else
+    for (int y = y0; y <= y1; y++) {
+        g_cVidstate.pixels[y * SCREEN_WIDTH + x] = color;
+    }
+#   endif
 }
 
 // u32* g_pTex = NULL;

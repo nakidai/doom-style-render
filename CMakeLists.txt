@@ -45,6 +45,4 @@ endif()
 # Assembly code only for x86-64
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
     target_sources(cl_main PRIVATE ./src/render/draw/asm/x86_r_draw.s)
-else()
-    target_sources(cl_main PRIVATE ./src/render/draw/asm/arm64_r_draw.s)
 endif()
