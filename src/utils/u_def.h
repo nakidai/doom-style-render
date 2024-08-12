@@ -60,19 +60,19 @@ typedef struct v2i_s { i32 x, y; } v2i;
 #define SCREEN_WIDTH 384
 #define SCREEN_HEIGHT 216
 
-struct wall {
-    v2i a, b;
-    int portal;
-};
+// struct wall {
+//     v2i a, b;
+//     int portal;
+// };
 
-// sector id for "no sector"
-#define SECTOR_NONE 0
-#define SECTOR_MAX 128
+// // sector id for "no sector"
+// #define SECTOR_NONE 0
+// #define SECTOR_MAX 128
 
-struct sector {
-    int id;
-    usize firstwall, nwalls;
-    f32 zfloor, zceil;
-};
+// struct sector {
+//     int id;
+//     usize firstwall, nwalls;
+//     f32 zfloor, zceil;
+// };
 
 #endif

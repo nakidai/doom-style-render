@@ -74,9 +74,9 @@ static inline float G_PointSide(v2 p, v2i a, v2i b) {
 }
 
 // point is in sector if it is on the left side of all walls
-static bool G_PointInSector(const struct sector* sector, v2 p) {
+static bool G_PointInSector(const sector_t* sector, v2 p) {
     for (usize i = 0; i < sector->nwalls; i++) {
-        const struct wall* _wall = &g_cState.map.walls.arr[sector->firstwall + i];
+        const wall_t* _wall = &g_cState.map.walls.arr[sector->firstwall + i];
 
         if (G_PointSide(p, _wall->a, _wall->b) > 0) {
             return false;
@@ -102,7 +102,7 @@ static void G_UpdatePlayerSector(void) {
         i = (i + 1) % (QUEUE_MAX);
         n--;
 
-        const struct sector* sector = &g_cState.map.sectors.arr[id];
+        const sector_t* sector = &g_cState.map.sectors.arr[id];
 
         if (G_PointInSector(sector, g_cPlayerstate.camera.pos)) {
             found = id;
@@ -111,7 +111,7 @@ static void G_UpdatePlayerSector(void) {
 
         // check neighbors
         for (usize j = 0; j < sector->nwalls; j++) {
-            const struct wall* wall =
+            const wall_t* wall =
                 &g_cState.map.walls.arr[sector->firstwall + j];
 
             if (wall->portal) {
@@ -137,7 +137,7 @@ static void G_UpdatePlayerSector(void) {
 
 static void G_UpdateEye(void) {
     const int sector_id = g_cPlayerstate.sector;
-    const struct sector* player_sector = &g_cState.map.sectors.arr[sector_id];
+    const sector_t* player_sector = &g_cState.map.sectors.arr[sector_id];
 
     g_cPlayerstate.camera.eye_z = player_sector->zfloor + PLAYER_EYE_Z;
 }

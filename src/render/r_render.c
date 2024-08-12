@@ -107,10 +107,10 @@ void R_Render() {
 
         sectdraw[entry.id] = true;
 
-        const struct sector* sector = &g_cState.map.sectors.arr[entry.id];
+        const sector_t* sector = &g_cState.map.sectors.arr[entry.id];
 
         for (usize i = 0; i < sector->nwalls; i++) {
-            const struct wall* wall =
+            const wall_t* wall =
                 &g_cState.map.walls.arr[sector->firstwall + i];
 
             // translate relative to player and rotate points around player's view
