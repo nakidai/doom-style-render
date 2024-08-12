@@ -4,8 +4,8 @@
 .extern g_pTex
 
 .section .text
-    .globl ASMD_VertLine # ASMD_VertLine(int y0, int y1, int x, u32 color)
-        ASMD_VertLine:
+    .globl D_VertLine # D_VertLine(int y0, int y1, int x, u32 color)
+        D_VertLine:
             mov r10d, edx
 
             # ecx  -> y0

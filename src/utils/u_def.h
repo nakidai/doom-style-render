@@ -15,10 +15,6 @@
 #define DEV_BUILD
 #define PARANOID
 
-#ifndef __x86_64__
-#define ASM_TO_C
-#endif
-
 #ifdef DEV_BUILD
 #define DEBUG_PRINT_INIT
 // #define DEBUG_PRINT_RUN
