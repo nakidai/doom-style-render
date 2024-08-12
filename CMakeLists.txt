@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 project(HaltyraEngine C ASM)
 
 add_compile_options(-g)
+add_compile_options(-fPIE)
 add_compile_options(-Wall)
 add_compile_options(-Wextra)
 
