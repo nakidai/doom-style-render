@@ -11,9 +11,9 @@ void SYS_Init(int _argc, char** _argv) {
 char* SYS_GetArg(const char* name) {
     char* out = NULL;
 
-    for (char* tok = strtok(argv, " "); tok != NULL; tok = strtok(NULL, " ")) {
-        if (strcmp(tok, name) == 0) {
-            out = strtok(NULL, " ");
+    for (int i = 0; i < argc; i++) {
+        if (strcmp(name, argv[i]) == 0) {
+            out = argv[i + 1];
             goto done;
         }
     }

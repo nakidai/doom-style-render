@@ -27,22 +27,22 @@ static void G_LoadMapHeader(map_header_t* header, const char* name) {
     goto fail;
 
     bin:
-        memcpy(header->geo_bin_dir, geo_bin_dir, sizeof(geo_bin_dir));
+        memcpy(header->geo_bin_dir, geo_bin_dir, strlen(geo_bin_dir));
         goto done;
 
     text:
-        memcpy(header->geo_txt_dir, geo_txt_dir, sizeof(geo_txt_dir));
+        memcpy(header->geo_txt_dir, geo_txt_dir, strlen(geo_txt_dir));
         goto done;
 
     fail:
-        if (geo_bin_dir != NULL) M_TempFree(geo_bin_dir);
-        if (geo_txt_dir != NULL) M_TempFree(geo_txt_dir);
+        if (geo_bin_dir != NULL) M_TempFree((void*) geo_bin_dir);
+        if (geo_txt_dir != NULL) M_TempFree((void*) geo_txt_dir);
 
         ERROR("G_LoadHeader: in %s map header not found geometry variable (geo_bin or geo_txt)", name);
 
     done:
-        if (geo_bin_dir != NULL) M_TempFree(geo_bin_dir);
-        if (geo_txt_dir != NULL) M_TempFree(geo_txt_dir);
+        if (geo_bin_dir != NULL) M_TempFree((void*) geo_bin_dir);
+        if (geo_txt_dir != NULL) M_TempFree((void*) geo_txt_dir);
 }
 
 static void G_LoadTextWalls(map_t* map, const char* source);
@@ -68,8 +68,8 @@ static void G_LoadTextWalls(map_t* map, const char* source) {
     conf_array_t array = C_GetArray((char*) source, "line");
     map->walls.n = array.s;
 
-    for (int i = 0; i < array.s; i++) {
-        const wall_t* wall = &map->walls.arr[i];
+    for (usize i = 0; i < array.s; i++) {
+        wall_t* wall = &map->walls.arr[i];
         if (sscanf(
             array.d[i], "%d %d %d %d %d",
             &wall->a.x,
@@ -80,17 +80,17 @@ static void G_LoadTextWalls(map_t* map, const char* source) {
         ) != 5) fail = true;
     }
 
-    for (int i = 0; i < array.s; i++) M_TempFree(array.d[i]);
+    for (usize i = 0; i < array.s; i++) M_TempFree((void*) array.d[i]);
     ASSERT(!fail, "G_LoadTextWalls: invalid wall format");
 }
 
 static void G_LoadTextSectors(map_t* map, const char* source) {
     bool fail = false;
-    conf_array_t array = C_GetArray(source, "sect");
+    conf_array_t array = C_GetArray((char*) source, "sect");
     map->sectors.n = array.s + 1;
 
-    for (int i = 0; i < array.s; i++) {
-        const sector_t* sector = &map->sectors.arr[i + 1];
+    for (usize i = 0; i < array.s; i++) {
+        sector_t* sector = &map->sectors.arr[i + 1];
         if (sscanf(
             array.d[i], "%d %zu %zu %f %f",
             &sector->id,
@@ -101,19 +101,20 @@ static void G_LoadTextSectors(map_t* map, const char* source) {
         ) != 5) fail = true;
     }
 
-    for (int i = 0; i < array.s; i++) M_TempFree(array.d[i]);
+    for (usize i = 0; i < array.s; i++) M_TempFree((void*) array.d[i]);
     ASSERT(!fail, "G_LoadTextSectors: invalid sector format");
 }
 
-static void G_LoadBinGeometry(map_t* map, const map_header_t header) {
-    ERROR("G_LoadBinGeometry: not implemented");
-}
+// static void G_LoadBinGeometry(map_t* map, const map_header_t header) {
+//     ERROR("G_LoadBinGeometry: not implemented");
+// }
 
 void G_LoadMap(map_t* map, const char* name) {
     map_header_t header = {};
 
     G_LoadMapHeader(&header, name);
 
-    if (*header.geo_bin_dir != '\0') G_LoadBinGeometry(map, header);
+    // if (*header.geo_bin_dir != '\0') G_LoadBinGeometry(map, header);
+    if (*header.geo_bin_dir != '\0') ERROR("G_LoadBinGeometry: not implemented");
     if (*header.geo_txt_dir != '\0') G_LoadTextGeometry(map, header);
 }

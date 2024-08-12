@@ -6,7 +6,7 @@ playerstate_t g_cPlayerstate;
 
 static void G_PlayerHandleKeys(void) {
     const u8* keystate = SDL_GetKeyboardState(NULL);
-    const f32 rot_speed = 3.0f * 0.016f, move_speed = 3.0f * 0.016f;
+    const f32 move_speed = 3.0f * 0.016f;
 
     // if (keystate[SDLK_RIGHT & 0xFFFF]) {
     //     g_cPlayerstate.camera.angle -= rot_speed;
