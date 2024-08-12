@@ -178,15 +178,15 @@ void M_TempCollect(void) {
 // reading size from string
 // returns the size in bytes
 static usize M_ReadMemSize(const char* size_str) {
-    char  type;
-    usize size;
+    char  type = '\0';
+    usize size = 0;
 
-    usize return_size = -1;
+    usize return_size = ULONG_MAX;
 
     if (sscanf(
         size_str,
-        "%u%c",
-        size, type
+        "%zu%c",
+        &size, &type
     ) != 2) goto fail;
 
     switch (type) {
@@ -215,7 +215,7 @@ static usize M_ReadMemSize(const char* size_str) {
     }
 
     done:
-        if (return_size == -1) goto fail;
+        if (return_size == ULONG_MAX) goto fail;
         return return_size;
 
     fail: ERROR("M_ReadMemSize: invalid memory format");
@@ -235,25 +235,25 @@ static void M_DebugBuffer(void* buf, usize size) {
     void* offset = buf;
     usize id = 0;
 
-    while (offset - (usize) buf < size) {
+    while ((usize) (offset - buf) < size) {
         mem_block_t* block = (mem_block_t*) offset;
         blocks[id++] = *block;
         if (block->next == NULL) break;
         offset = block->next;
     }
 
-    printf(" block count: %i\n", id);
+    printf(" block count: %zu\n", id);
 
     printf(" -- blocks --\n");
-    for (int i = 0; i < id; i++) {
+    for (usize i = 0; i < id; i++) {
         const mem_block_t block = blocks[i];
 
-        printf("  - block %i -\n", i);
+        printf("  - block %zu -\n", i);
         printf("   tag: %i\n", block.tag);
-        printf("   size: %x\n", block.size);
+        printf("   size: %zx\n", block.size);
         printf("   sig: %x\n", block.sig);
-        printf("   prev: %x\n", block.prev);
-        printf("   next: %x\n", block.next);
+        printf("   prev: %zx\n", (usize) block.prev);
+        printf("   next: %zx\n", (usize) block.next);
     }
 }
 
@@ -273,7 +273,7 @@ static void* M_BufAlloc(void* buf, usize size, usize buf_size) {
     void* addr = NULL; // return address
     void* offset = buf;
 
-    while (offset - (usize) buf < buf_size) {
+    while ((usize) (offset - buf) < buf_size) {
         mem_block_t* block = (mem_block_t*) offset; // getting block by address
 
         if (block->tag != FREE_BLOCK_TAG) goto next; // if the block is not empty we move on to the next one
