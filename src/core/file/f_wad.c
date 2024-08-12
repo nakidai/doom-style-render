@@ -89,7 +89,7 @@ void W_LoadWAD(wad_t* wad) {
     PRINT("W_LoadWAD: header: dir_offset: %i\n", wad->header.dir_offset);
 
     PRINT("W_LoadWAD: reading directories\n");
-    for (int i = 0; i < wad->header.dir_count; i++) {
+    for (u32 i = 0; i < wad->header.dir_count; i++) {
         wad_directory_t dir = {};
 
         W_ReadDirectory(
@@ -113,7 +113,7 @@ void W_CloseWAD(wad_t* wad) {
 }
 
 wad_directory_t W_FindDirectory(wad_t* wad, const char* name) {
-    for (int i = 0; i < wad->header.dir_count; i++) {
+    for (u32 i = 0; i < wad->header.dir_count; i++) {
         const wad_directory_t dir = wad->dirs[i];
 
         if (!strcmp(dir.lump_name, name)) {
