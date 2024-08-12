@@ -1,3 +1,0 @@
-C:/Users/glebm/CmakeProj/haltura-engine/build/CMakeFiles/cl_main.dir
-C:/Users/glebm/CmakeProj/haltura-engine/build/CMakeFiles/edit_cache.dir
-C:/Users/glebm/CmakeProj/haltura-engine/build/CMakeFiles/rebuild_cache.dir
