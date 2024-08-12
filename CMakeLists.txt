@@ -4,7 +4,6 @@ project(HaltyraEngine)
 add_compile_options(-g)
 add_compile_options(-Wall)
 add_compile_options(-Wextra)
-add_compile_options(-std=c2x)
 
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
