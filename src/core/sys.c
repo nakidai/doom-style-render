@@ -13,6 +13,8 @@ char* SYS_GetArg(const char* name) {
 
     for (int i = 0; i < argc; i++) {
         if (strcmp(name, argv[i]) == 0) {
+            if (i + 1 >= argc) goto done;
+
             out = argv[i + 1];
             goto done;
         }
