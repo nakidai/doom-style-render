@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(HaltyraEngine)
+project(HaltyraEngine C ASM)
 
 add_compile_options(-g)
 add_compile_options(-Wall)
