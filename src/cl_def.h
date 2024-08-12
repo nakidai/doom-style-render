@@ -12,6 +12,7 @@
 #include "core/file/f_conf.h"
 #include "utils/u_def.h"
 #include "core/mem/m_alloc.h"
+#include "core/mem/m_utils.h"
 #include "render/draw/r_draw.h"
 #include "core/sys.h"
 #include "utils/u_state.h"

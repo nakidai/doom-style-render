@@ -7,6 +7,7 @@ add_executable(t_mem ./t_mem.c)
 
 target_sources(t_mem PRIVATE
     ./../src/core/mem/m_alloc.c
+    ./../src/core/mem/m_utils.c
     ./../src/core/sys.c
 )
 
