@@ -2,6 +2,7 @@
 #define _r_texture_h
 
 #include "../../utils/u_def.h"
+#include "../../utils/math/u_math.h"
 
 typedef struct {
     u32* data;

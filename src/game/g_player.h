@@ -2,6 +2,7 @@
 #define _g_player_h
 
 #include "../utils/u_def.h"
+#include "../utils/math/u_math.h"
 
 #define PLAYER_EYE_Z 1.1f
 

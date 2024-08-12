@@ -5,7 +5,7 @@ static void T_SysGetArg(void) {
 
     SYS_Init(3, args);
 
-    if (SYS_GetArg("-first_arg") != "first_value") ERROR("T_SysGetArg: get argument error");
+    if (strcmp(SYS_GetArg("-first_arg"), "first_value") != 0) ERROR("T_SysGetArg: get argument error");
     if (SYS_GetArg("-null_arg") != NULL)           ERROR("T_SysGetArg: get argument error");
     if (SYS_GetArg("-second_arg") != NULL)         ERROR("T_SysGetArg: get argument error");
 }
