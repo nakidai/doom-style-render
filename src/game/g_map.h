@@ -17,6 +17,7 @@ typedef struct {
     int id;
     usize firstwall, nwalls;
     f32 zfloor, zceil;
+    u8 light;
 } sector_t;
 
 typedef struct {
