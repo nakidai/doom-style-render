@@ -12,13 +12,29 @@ u32 W_Read4Bytes(const u8* data, int offset) {
     return value;
 }
 
-static inline const char* W_FindWadPath(void) {
-    return "./../../res/test.wad";
+static char* W_FindWadPath(void) {
+#   ifdef DEV_BUILD
+#   define DEFAULT_WAD_PATH "./../../res/"
+#   define DEFAULT_WAD_NAME "test.wad"
+#   else
+#   define DEFAULT_WAD_PATH "./"
+#   define DEFAULT_WAD_NAME "game.wad"
+#   endif
+
+    const char* path = SYS_GetArg("-wadPath") == NULL ? DEFAULT_WAD_PATH : SYS_GetArg("-wadPath");
+    const char* name = SYS_GetArg("-wadName") == NULL ? DEFAULT_WAD_NAME : SYS_GetArg("-wadName");
+
+    char* out = M_TempAlloc(strlen(path) + strlen(name));
+    strcat(out, path);
+    strcat(out, name);
+
+    return out;
 }
 
 static void W_ReadWAD(wad_t* wad) {
-    const char* path = W_FindWadPath();
+    char* path = W_FindWadPath();
     FILE* file = fopen(path, "rb");
+    M_TempFree(path);
 
     ASSERT(
         file != NULL,
