@@ -92,13 +92,14 @@ static void G_LoadTextSectors(map_t* map, const char* source) {
     for (usize i = 0; i < array.s; i++) {
         sector_t* sector = &map->sectors.arr[i + 1];
         if (sscanf(
-            array.d[i], "%d %zu %zu %f %f",
+            array.d[i], "%d %zu %zu %f %f %zu",
             &sector->id,
             &sector->firstwall,
             &sector->nwalls,
             &sector->zfloor,
-            &sector->zceil
-        ) != 5) fail = true;
+            &sector->zceil,
+            &sector->light
+        ) != 6) fail = true;
     }
 
     for (usize i = 0; i < array.s; i++) M_TempFree((void*) array.d[i]);

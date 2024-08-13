@@ -176,13 +176,15 @@ void R_Render() {
                     yf = clamp(tyf + vert_angl, g_cState.y_lo[x], g_cState.y_hi[x]),
                     yc = clamp(tyc + vert_angl, g_cState.y_lo[x], g_cState.y_hi[x]);
 
+                const u8 light = sector->light;
+
                 // floor
                 if (yf > g_cState.y_lo[x]) {
                     D_VertLine(
                         g_cState.y_lo[x],
                         yf,
                         x,
-                        0xFFFF0000);
+                        R_AbgrMul(0xFFFF0000, light));
                 }
 
                 // ceiling
@@ -191,7 +193,7 @@ void R_Render() {
                         yc,
                         g_cState.y_hi[x],
                         x,
-                        0xFF00FFFF);
+                        R_AbgrMul(0xFF00FFFF, light));
                 }
 
                 if (wall->portal) {
@@ -205,13 +207,13 @@ void R_Render() {
                         nyc,
                         yc,
                         x,
-                        R_AbgrMul(0xFF00FF00, shade));
+                        R_AbgrMul(R_AbgrMul(0xFF00FF00, shade), light));
 
                     D_VertLine(
                         yf,
                         nyf,
                         x,
-                        R_AbgrMul(0xFF0000FF, shade));
+                        R_AbgrMul(R_AbgrMul(0xFF0000FF, shade), light));
 
                     g_cState.y_hi[x] = clamp(min(min(yc, nyc), g_cState.y_hi[x]), 0, SCREEN_HEIGHT - 1);
                     g_cState.y_lo[x] = clamp(max(max(yf, nyf), g_cState.y_lo[x]), 0, SCREEN_HEIGHT - 1);
@@ -221,7 +223,7 @@ void R_Render() {
                         yf,
                         yc,
                         x,
-                        R_AbgrMul(0xFFFFFFFF, shade));
+                        R_AbgrMul(R_AbgrMul(0xFFFFFFFF, shade), light));
                 }
 
                 if (g_cState.sleepy) {
