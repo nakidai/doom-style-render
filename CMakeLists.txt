@@ -11,5 +11,8 @@ enable_testing()
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 
-add_subdirectory(src   ./src)
-add_subdirectory(tests ./tests)
+include_directories(./src)
+
+add_subdirectory(src    ./src)
+add_subdirectory(tests  ./tests)
+add_subdirectory(editor ./editor)
