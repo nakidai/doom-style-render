@@ -1,3 +1,4 @@
 build/
+SDL2_ttf/
 
 *.bak

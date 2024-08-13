@@ -2,9 +2,29 @@
 
 state_t       g_cState;
 SDL_Renderer* renderer;
+TTF_Font*     font;
 
 float scale = 50.0f;
 v2 pos =      { 0, 0 };
+
+static void ME_DrawString(int x, int y, const char* line) {
+    SDL_Color color = { 255, 255, 255, 255 };
+    SDL_Surface *surf = TTF_RenderText_Blended(font, line, color);
+    if (surf == NULL) ERROR("ME_DrawString: kakoito error");
+
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surf);
+    if (texture == NULL) ERROR("ME_DrawString: kakoito error");
+
+    SDL_FreeSurface(surf);
+    
+    SDL_Rect rect;
+    rect.x = x;
+    rect.y = y;
+    rect.w = 24 * strlen(line);
+    rect.h = 24;
+
+    SDL_RenderCopy(renderer, texture, NULL, &rect);
+}
 
 static void ME_Render(void) {
     for (int i = 0; i < g_cState.map.walls.n; i++) {
@@ -44,8 +64,7 @@ static void ME_Render(void) {
         char num[10];
         sprintf(num, "%i", sector->id);
 
-        SDLTest_DrawString(
-            renderer,
+        ME_DrawString(
             (center.x + pos.x) * (int) scale,
             (center.y + pos.y) * (int) scale,
             num
@@ -74,6 +93,8 @@ int main() {
         SDL_GetError()
     );
 
+    TTF_Init();
+
     SDL_Window* window = SDL_CreateWindow(
         "Haltura editor",
         SDL_WINDOWPOS_CENTERED_DISPLAY(0),
@@ -96,6 +117,8 @@ int main() {
         SDL_RENDERER_PRESENTVSYNC
     );
 
+    font = TTF_OpenFont("./../../res/Sans.ttf", 24);
+
     W_LoadWAD(&g_cState.wad);
     G_LoadMap(&g_cState.map, "TEST");
 
@@ -107,7 +130,7 @@ int main() {
                 case SDL_QUIT: goto exit;
                 default: break;
             }
-        }
+        } 
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);

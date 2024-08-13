@@ -8,9 +8,14 @@ add_compile_options(-Wextra)
 
 enable_testing()
 
-find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS})
+if (WIN32)
+    include(./SDL2_ttf/sdl2-ttf-config.cmake)
+endif()
 
+find_package(SDL2 REQUIRED)
+
+include_directories(${SDL2_INCLUDE_DIRS})
+include_directories(${SDL_TTF_INCLUDE_DIRS})
 include_directories(./src)
 
 add_subdirectory(src    ./src)
