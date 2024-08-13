@@ -27,5 +27,5 @@ if(WIN32)
 endif()
 
 if(UNIX)
-    target_link_libraries(me_main m)
+    target_link_libraries(me_main m SDL2_ttf)
 endif()
