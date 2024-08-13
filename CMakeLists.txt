@@ -10,10 +10,12 @@ enable_testing()
 
 if (WIN32)
     set(SDL2TTF_DIR ./SDL2_ttf/)
+    find_package(SDL2TTF REQUIRED)
+else()
+    find_package(SDL2_TTF REQUIRED)
 endif()
 
 find_package(SDL2 REQUIRED)
-find_package(SDL2_TTF REQUIRED)
 
 include_directories(${SDL2_INCLUDE_DIRS})
 include_directories(${SDL_TTF_INCLUDE_DIRS})
