@@ -12,7 +12,8 @@
 
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_test_font.h>
+#define DLL_EXPORT
+#include <SDL2/SDL_ttf.h>
 
 #define DEV_BUILD
 #define PARANOID

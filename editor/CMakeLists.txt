@@ -3,7 +3,7 @@ project(editor)
 # me_main executable
 add_executable(me_main ./me_main.c)
 
-target_link_libraries(me_main ${SDL2_LIBRARIES})
+target_link_libraries(me_main ${SDL2_LIBRARIES} ${SDL_TTF_LIBRARIES})
 
 target_sources(me_main PRIVATE
     ./../src/core/mem/m_alloc.c
@@ -22,6 +22,7 @@ if(WIN32)
         Setupapi.lib
         gdi32.lib
         version.lib
+        Rpcrt4.lib
     )
 endif()
 

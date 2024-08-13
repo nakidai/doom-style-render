@@ -86,7 +86,13 @@
     "r_draw.h": "c",
     "f_conf.h": "c",
     "m_utils.h": "c",
-    "sdl_test_font.h": "c"
+    "sdl_test_font.h": "c",
+    "stdint.h": "c",
+    "time.h": "c",
+    "limits.h": "c",
+    "sdl_ttf.h": "c",
+    "m_alloc.h": "c",
+    "sys.h": "c"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }
