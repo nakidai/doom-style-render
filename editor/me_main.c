@@ -1,4 +1,5 @@
 #include "cl_def.h"
+#include <SDL2/SDL_test.h>
 
 state_t       g_cState;
 SDL_Renderer* renderer;
@@ -8,6 +9,7 @@ float scale = 50.0f;
 v2 pos =      { 0, 0 };
 
 static void ME_DrawString(int x, int y, const char* line) {
+#   ifndef __WIN32
     SDL_Color color = { 255, 255, 255, 255 };
     SDL_Surface *surf = TTF_RenderText_Blended(font, line, color);
     if (surf == NULL) ERROR("ME_DrawString: kakoito error");
@@ -24,6 +26,9 @@ static void ME_DrawString(int x, int y, const char* line) {
     rect.h = 24;
 
     SDL_RenderCopy(renderer, texture, NULL, &rect);
+#   else
+    SDLTest_DrawString(renderer, x, y, line);
+#   endif
 }
 
 static void ME_Render(void) {
@@ -93,7 +98,10 @@ int main() {
         SDL_GetError()
     );
 
+#   ifndef __WIN32
     TTF_Init();
+    font = TTF_OpenFont("./../../res/Sans.ttf", 24);
+#   endif
 
     SDL_Window* window = SDL_CreateWindow(
         "Haltura editor",
@@ -116,8 +124,6 @@ int main() {
         SDL_RENDERER_ACCELERATED |
         SDL_RENDERER_PRESENTVSYNC
     );
-
-    font = TTF_OpenFont("./../../res/Sans.ttf", 24);
 
     W_LoadWAD(&g_cState.wad);
     G_LoadMap(&g_cState.map, "TEST");
