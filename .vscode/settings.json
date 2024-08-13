@@ -83,7 +83,10 @@
     "type_traits": "c",
     "utility": "c",
     "u_math.h": "c",
-    "r_draw.h": "c"
+    "r_draw.h": "c",
+    "f_conf.h": "c",
+    "m_utils.h": "c",
+    "sdl_test_font.h": "c"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }
