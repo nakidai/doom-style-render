@@ -92,7 +92,7 @@ static void G_LoadTextSectors(map_t* map, const char* source) {
     for (usize i = 0; i < array.s; i++) {
         sector_t* sector = &map->sectors.arr[i + 1];
         if (sscanf(
-            array.d[i], "%d %zu %zu %f %f %zu",
+            array.d[i], "%d %zu %zu %f %f %hhu",
             &sector->id,
             &sector->firstwall,
             &sector->nwalls,
