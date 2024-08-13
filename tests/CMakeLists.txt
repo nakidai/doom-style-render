@@ -1,7 +1,5 @@
 project(tests)
 
-include_directories(./../src)
-
 # tests
 add_executable(t_mem  ./t_mem.c)
 add_executable(t_sys  ./t_sys.c)
