@@ -13,7 +13,7 @@ if (WIN32)
 endif()
 
 find_package(SDL2 REQUIRED)
-find_package(SDL2TTF REQUIRED)
+find_package(SDL2_TTF REQUIRED)
 
 include_directories(${SDL2_INCLUDE_DIRS})
 include_directories(${SDL_TTF_INCLUDE_DIRS})
