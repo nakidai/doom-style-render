@@ -19,5 +19,7 @@
 #include "utils/math/u_math.h"
 #include "cmd/cmd_exec.h"
 #include "game/g_phys.h"
+#include "console/c_con.h"
+#include "console/c_draw.h"
 
 #endif

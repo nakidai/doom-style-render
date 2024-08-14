@@ -46,10 +46,6 @@ static void G_PlayerHandleKeys(void) {
     if (keystate[SDLK_F1 & 0xFFFF]) {
         g_cState.sleepy = true;
     }
-
-    if (keystate[SDLK_ESCAPE & 0xFFFF]) {
-        g_cState.quit = true;
-    }
 }
 
 #define SENS 0.01f

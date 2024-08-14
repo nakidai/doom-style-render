@@ -12,6 +12,15 @@ void T_ReadTexture(texture_t* tex, const char* path) {
     BMP* bmp = bopen((char*) path);
     tex->size = (v2i) { get_width(bmp), get_height(bmp) };
     T_AllocTexture(tex);
+
+    for (int i = 0; i < tex->size.x; i++) {
+        for (int j = 0; j < tex->size.y; j++) {
+            int r, g, b;
+            get_pixel_rgb(bmp, i, j, &r, &g, &b);
+
+            tex->data[j * tex->size.x + i] = r;
+        }
+    }
 }
 
 void T_GenDebugTexture(texture_t* tex) {
