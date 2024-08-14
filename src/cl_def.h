@@ -18,5 +18,6 @@
 #include "utils/u_state.h"
 #include "utils/math/u_math.h"
 #include "cmd/cmd_exec.h"
+#include "game/g_phys.h"
 
 #endif
