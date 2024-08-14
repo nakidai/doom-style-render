@@ -10,10 +10,10 @@ typedef struct {
     bool quit;
     bool sleepy;
 
+    f64 delta_time;
+
     wad_t wad;
     map_t map;
-
-    texture_t* debug_texture;
 
     u16 y_lo[SCREEN_WIDTH], y_hi[SCREEN_WIDTH];
 } state_t;

@@ -11,8 +11,10 @@
 #define DEG2RAD(_d) ((_d) * (PI / 180.0f))
 #define RAD2DEG(_d) ((_d) * (180.0f / PI))
 
-typedef struct v2_s { f32 x, y; } v2;
+typedef struct v2_s  { f32 x, y; } v2;
 typedef struct v2i_s { i32 x, y; } v2i;
+typedef struct v3_s  { f32 x, y, z; } v3;
+typedef struct v3i_s { i32 x, y, z; } v3i;
 
 #define v2_to_v2i(_v) ({ typeof(_v) __v = (_v); (v2i) { __v.x, __v.y }; })
 #define v2i_to_v2(_v) ({ typeof(_v) __v = (_v); (v2) { __v.x, __v.y }; })

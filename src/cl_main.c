@@ -38,12 +38,20 @@ static void CL_CheckWindowEvents(void) {
 }
 
 static void CL_MainLoop(void) {
+    u64 now = SDL_GetPerformanceCounter(),
+        last = 0;
+
     while (!g_cState.quit) {
         CL_CheckWindowEvents();
 
         if (g_cState.quit) {
             break;
         }
+
+        last = now;
+        now = SDL_GetPerformanceCounter();
+
+        g_cState.delta_time = (double) ((now - last) * 1000 / (double) SDL_GetPerformanceFrequency());
 
         G_UpdatePlayer();
 

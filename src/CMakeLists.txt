@@ -18,6 +18,7 @@ target_sources(cl_main PRIVATE
     ./core/mem/m_utils.c
     ./core/sys.c
     ./utils/math/u_math.c
+    ./game/g_phys.c
 )
 
 if(WIN32)
