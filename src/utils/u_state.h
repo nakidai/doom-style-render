@@ -6,7 +6,14 @@
 #include "../core/file/f_wad.h"
 #include "../render/utils/r_texture.h"
 
+typedef enum {
+    LEVEL_STATE,
+    CONSOLE_STATE,
+} state_type_t;
+
 typedef struct {
+    state_type_t state;
+
     bool quit;
     bool sleepy;
 

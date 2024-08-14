@@ -19,6 +19,9 @@ target_sources(cl_main PRIVATE
     ./core/sys.c
     ./utils/math/u_math.c
     ./game/g_phys.c
+    ./console/c_con.c
+    ./console/c_draw.c
+    ./cmd/cmd_exec.c
 )
 
 if(WIN32)
