@@ -4,6 +4,7 @@
 #include "u_def.h"
 #include "../game/g_map.h"
 #include "../core/file/f_wad.h"
+#include "../render/utils/r_texture.h"
 
 typedef struct {
     bool quit;

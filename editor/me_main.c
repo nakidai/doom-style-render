@@ -1,9 +1,13 @@
 #include "cl_def.h"
+#include "me_cmds.h"
 #include <SDL2/SDL_test.h>
 
 state_t       g_cState;
 SDL_Renderer* renderer;
 TTF_Font*     font;
+
+v2i   points[64];
+usize point_count = 0;
 
 float scale = 50.0f;
 v2 pos =      { 0, 0 };
@@ -31,15 +35,31 @@ static void ME_DrawString(int x, int y, const char* line) {
 #   endif
 }
 
-bool draw_wall_num = true;
+bool draw_wall_num = false;
 bool draw_sect_num = true;
+int  selected_wall = -1;
+int  selected_point = -1;
 
 static void ME_Render(void) {
+    for (int i = 0; i < point_count; i++) {
+        SDL_Rect rect;
+        rect.x = (points[i].x + pos.x) * (int) scale;
+        rect.y = (points[i].y + pos.y) * (int) scale;
+        rect.w = 5;
+        rect.h = 5;
+
+        if (i == selected_point) SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+        else                     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+        SDL_RenderDrawRect(renderer, &rect);
+    }
+
     for (int i = 0; i < g_cState.map.walls.n; i++) {
         const wall_t* wall = &g_cState.map.walls.arr[i];
 
-        if (wall->portal == 0) SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        else                   SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+        if (wall->portal == 0)  SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        else                    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+        if (i == selected_wall) SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
 
         SDL_RenderDrawLine(
             renderer,
@@ -116,52 +136,15 @@ static void ME_ProcessEvents(void) {
     if (keystate[SDLK_RIGHT & 0xFFFF]) pos.x -= MOVE_SPEED;
 }
 
-int ME_AddPoint(char* args) {
-    v2i pos = { NAN, NAN };
-
-    if (*args == 'c') {
-        int x, y;
-        SDL_GetMouseState(&x, &y);
-
-        pos.x = x / scale;
-        pos.y = y / scale;
-
-        goto done;
-    } else {
-        if (sscanf(
-            args,
-            "%i %i",
-            &pos.x,
-            &pos.y
-        ) != 2) return 2;
-
-        goto done;
-    }
-
-    done:
-        return SUCCESS;
-}
-
-int ME_Scale(char* args) {
-    if (sscanf(
-        args,
-        "%f",
-        &scale
-    ) != 1) return 2;
-    return SUCCESS;
-}
-
-static void ME_InitCommands(void) {
-    CMD_AddCommand("ap", &ME_AddPoint);
-    CMD_AddCommand("s", &ME_Scale);
-}
-
 static char console_buf[64] = {};
+static char con_out_buf[64] = {};
 
 int main(int argc, char* argv[]) {
     SYS_Init(argc, argv);
     M_Init();
     CMD_Init();
+
+    g_cState.map.sectors.n = 1;
 
     ASSERT(
         !SDL_Init(SDL_INIT_VIDEO),
@@ -197,9 +180,7 @@ int main(int argc, char* argv[]) {
     );
 
     W_LoadWAD(&g_cState.wad);
-    G_LoadMap(&g_cState.map, "TEST");
-
-    ME_InitCommands();
+    ME_SetupCommands();
 
     while (true) {
         SDL_Event ev;
@@ -220,7 +201,12 @@ int main(int argc, char* argv[]) {
                     memcpy(buf_ptr, console_buf, strlen(console_buf));
                     memset(buf_ptr + strlen(console_buf), '\0', sizeof(console_buf) - strlen(console_buf));
 
-                    CMD_ExecuteText(buf_ptr);
+                    snprintf(
+                        con_out_buf,
+                        sizeof(con_out_buf),
+                        "Command exited with code %i",
+                        CMD_ExecuteText(buf_ptr)
+                    );
                     M_TempFree(buf_ptr);
                     memset(console_buf, '\0', sizeof(console_buf));
 
@@ -238,6 +224,7 @@ int main(int argc, char* argv[]) {
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         ME_DrawString(10, 10, console_buf);
+        ME_DrawString(10, 20, con_out_buf);
 
         ME_ProcessEvents();
 
