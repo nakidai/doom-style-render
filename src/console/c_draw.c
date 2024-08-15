@@ -16,7 +16,7 @@ extern char con_buf[1024];
 void CON_DrawChar(v2i pos, const char c) {
     for (int i = 0; i < CHAR_SIZE; i++) {
         for (int j = 0; j < CHAR_SIZE; j++) {
-            if (con_chars.data[j * con_chars.size.x + (i + (int) c * CHAR_SIZE)] == 0x00000000) continue; 
+            if (con_chars.data[j * con_chars.size.x + (i + (int) c * CHAR_SIZE)] == 0xFF000000) continue;
             g_cVidstate.pixels[(j + pos.y) * SCREEN_WIDTH + (i + pos.x)] = con_chars.data[j * con_chars.size.x + (i + (int) c * CHAR_SIZE)];
         }
     }

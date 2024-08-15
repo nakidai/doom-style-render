@@ -126,7 +126,7 @@ static void G_UpdatePlayerSector(void) {
 
     done:
         if (!found) {
-            g_cPlayerstate.sector = 1;
+            // g_cPlayerstate.sector = 1;
         }
         else {
             g_cPlayerstate.sector = found;
@@ -162,6 +162,11 @@ void G_UpdatePlayer(void) {
     if (g_cPlayerstate.phys_obj.pos.z < g_cState.map.sectors.arr[g_cPlayerstate.sector].zfloor) {
         g_cPlayerstate.phys_obj.vel.z = 0;
         g_cPlayerstate.phys_obj.pos.z = g_cState.map.sectors.arr[g_cPlayerstate.sector].zfloor;
+    }
+
+    if (g_cPlayerstate.phys_obj.pos.z + PLAYER_EYE_Z > g_cState.map.sectors.arr[g_cPlayerstate.sector].zceil) {
+        g_cPlayerstate.phys_obj.vel.z = 0;
+        g_cPlayerstate.phys_obj.pos.z = g_cState.map.sectors.arr[g_cPlayerstate.sector].zceil - PLAYER_EYE_Z;
     }
 
     g_cPlayerstate.camera.pos.x = g_cPlayerstate.phys_obj.pos.x;

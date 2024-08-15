@@ -5,7 +5,8 @@ static char con_in[32];
 
 cmd_var_t test_variable = { "test", "this is test variable" };
 
-extern state_t g_cState;
+extern state_t    g_cState;
+extern vidstate_t g_cVidstate;
 
 int CMD_Echo(char* args) {
     char buf[64];
@@ -28,6 +29,7 @@ int CMD_ExecCommand(char* args) {
 
     char line[64];
     while (fgets(line, 64, file)) {
+        if (line[strlen(line)] == '\n') line[strlen(line)] = '\0';
         CMD_ExecuteText(line);
     }
 
@@ -53,10 +55,12 @@ void CON_Free(void) {
 }
 
 void CON_Draw(void) {
+    GFX_Blackout(128, (v2i) { 0, 0 }, (v2i) { SCREEN_WIDTH, SCREEN_HEIGHT });
+
     CON_DrawString((v2i) { 5, SCREEN_HEIGHT - 10 }, con_buf);
 
     char buf[64];
-    snprintf(buf, sizeof(buf), "> %s", con_in);
+    snprintf(buf, sizeof(buf), "] %s", con_in);
 
     CON_DrawString((v2i) { 10, 10 }, buf);
 }
