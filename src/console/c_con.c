@@ -5,6 +5,8 @@ static char con_in[32];
 
 cmd_var_t test_variable = { "test", "this is test variable" };
 
+extern state_t g_cState;
+
 int CMD_Echo(char* args) {
     char buf[64];
     snprintf(buf, sizeof(buf), "%s\n", args);
@@ -13,10 +15,34 @@ int CMD_Echo(char* args) {
     return SUCCESS;
 }
 
+int CMD_LoadMap(char* args) {
+    G_LoadMap(&g_cState.map, args);
+    
+    return SUCCESS;
+}
+
+int CMD_ExecCommand(char* args) {
+    FILE* file = fopen(args, "r");
+
+    if (file == NULL) return 2;
+
+    char line[64];
+    while (fgets(line, 64, file)) {
+        CMD_ExecuteText(line);
+    }
+
+    fclose(file);
+    
+    return SUCCESS;
+}
+
 void CON_Init(void) {
     CON_DrawInit();
 
     CMD_AddCommand("echo", &CMD_Echo);
+    CMD_AddCommand("map",  &CMD_LoadMap);
+    CMD_AddCommand("exec", &CMD_ExecCommand);
+
     CMD_AddVariable(&test_variable);
 
     CON_Printf("console init done!\n");
