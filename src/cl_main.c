@@ -72,12 +72,7 @@ static void CL_MainLoop(void) {
         V_Update();
         R_Render();
 
-        for (int i = 0; i < SCREEN_WIDTH; i++) {
-            for (int j = 0; j < SCREEN_HEIGHT; j++) {
-                const u32 color = g_cVidstate.pixels[j * SCREEN_WIDTH + i];
-                g_cVidstate.pixels[j * SCREEN_WIDTH + i] = (i % 2 == 0) && (j % 2 == 0) ? R_AbgrMul(color, 192) : color;
-            }
-        }
+        // GFX_Diseling(192, (v2i) { 0, 0 }, (v2i) { SCREEN_WIDTH, SCREEN_HEIGHT });
 
         if (g_cState.state == CONSOLE_STATE) CON_Draw();
 

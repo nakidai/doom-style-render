@@ -21,5 +21,6 @@
 #include "game/g_phys.h"
 #include "console/c_con.h"
 #include "console/c_draw.h"
+#include "game/gfx/gfx_post_process.h"
 
 #endif

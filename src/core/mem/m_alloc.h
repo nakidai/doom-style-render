@@ -5,7 +5,7 @@
 #include "m_utils.h"
 
 #define TEMP_HEAP KB(128)
-#define GLOB_HEAP MB(12)
+#define GLOB_HEAP MB(14)
 
 #define TEMP_COLLECT_RATE 25
 #define GLOB_COLLECT_RATE 50

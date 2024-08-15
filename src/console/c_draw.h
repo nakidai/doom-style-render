@@ -3,7 +3,7 @@
 
 #include "utils/u_def.h"
 
-#define CHAR_SIZE 12
+#define CHAR_SIZE 16
 
 void CON_DrawInit(void);
 void CON_DrawFree(void);

@@ -15,10 +15,27 @@ void T_ReadTexture(texture_t* tex, const char* path) {
 
     for (int i = 0; i < tex->size.x; i++) {
         for (int j = 0; j < tex->size.y; j++) {
-            int r, g, b;
-            get_pixel_rgb(bmp, i, j, &r, &g, &b);
+            u32 r, g, b;
 
-            tex->data[j * tex->size.x + i] = r;
+            {
+                u8 _r, _g, _b;
+                get_pixel_rgb(bmp, i, j, &_r, &_g, &_b);
+
+                r = (u32) _r;
+                g = (u32) _g;
+                b = (u32) _b;
+            }
+
+            u32 color = 0xFF000000;
+
+            b = b << 16;
+            g = g << 8;
+
+            color = color | b;
+            color = color | g;
+            color = color | r;
+
+            tex->data[j * tex->size.x + i] = color;
         }
     }
 }
