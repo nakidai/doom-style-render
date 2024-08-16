@@ -5,8 +5,8 @@ typedef struct {
     char     name[64];
 } cmd_t;
 
-static cmd_t      cmds[1024]     = { NULL };
-static cmd_var_t* cmd_vars[1024] = { NULL };
+static cmd_t      cmds[128]     = { NULL };
+static cmd_var_t* cmd_vars[256] = { NULL };
 static usize      cmd_len     = 0;
 static usize      cmd_var_len = 0;
 
@@ -35,7 +35,7 @@ int CMD_ExecuteText(const char* in) {
 
     int ret = VARIABLE;
 
-    char* text = M_TempAlloc(strlen(in) + 1);
+    char text[64] = {'\0'};
     memcpy(text, in, strlen(in));
     text[strlen(in)] = '\0';
 
@@ -66,6 +66,5 @@ int CMD_ExecuteText(const char* in) {
     ret = COMMAND_NOT_FOUND;
 
     done:
-        M_TempFree(text);
         return ret;
 }
