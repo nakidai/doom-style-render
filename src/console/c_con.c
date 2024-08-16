@@ -29,7 +29,7 @@ int CMD_ExecCommand(char* args) {
 
     char line[64];
     while (fgets(line, 64, file)) {
-        if (line[strlen(line)] == '\n') line[strlen(line)] = '\0';
+        if (line[strlen(line) - 1] == '\n') line[strlen(line) - 1] = '\0';
         CMD_ExecuteText(line);
     }
 
@@ -38,12 +38,24 @@ int CMD_ExecCommand(char* args) {
     return SUCCESS;
 }
 
+int CMD_ToggleConsole(char* args) {
+    g_cState.state = g_cState.state == CONSOLE_STATE ? LEVEL_STATE : CONSOLE_STATE;
+    return SUCCESS;
+}
+
+int CMD_ExitCommand(char* args) {
+    g_cState.quit = false;
+    return SUCCESS;
+}
+
 void CON_Init(void) {
     CON_DrawInit();
 
-    CMD_AddCommand("echo", &CMD_Echo);
-    CMD_AddCommand("map",  &CMD_LoadMap);
-    CMD_AddCommand("exec", &CMD_ExecCommand);
+    CMD_AddCommand("toggle_console", &CMD_ToggleConsole);
+    CMD_AddCommand("echo",           &CMD_Echo);
+    CMD_AddCommand("map",            &CMD_LoadMap);
+    CMD_AddCommand("exec",           &CMD_ExecCommand);
+    CMD_AddCommand("exit",           &CMD_ExitCommand);
 
     CMD_AddVariable(&test_variable);
 
@@ -69,12 +81,12 @@ void CON_Printf(const char* msg) {
     strcat(con_buf, msg);
 }
 
-void CON_ProcessInput(const char* text) {
+static void CON_ProcessInput(const char* text) {
     if (strlen(con_in) >= sizeof(con_in)) return;
     strcat(con_in, text);
 }
 
-void CON_Exec(void) {
+static void CON_Exec(void) {
     if (strlen(con_in) == 0) return;
 
     char* buf_ptr = M_TempAlloc(strlen(con_in));
@@ -87,4 +99,26 @@ void CON_Exec(void) {
 
     memset(con_in, '\0', sizeof(con_in));
     M_TempFree(buf_ptr);
+}
+
+void CON_Update(void) {
+    SDL_Event ev;
+
+    for (int i = 0; i < g_cState.event_count; i++) {
+        SDL_Event ev = g_cState.events[i];
+        
+        switch (ev.type) {
+            case SDL_TEXTINPUT:
+                if (g_cState.state != CONSOLE_STATE) break;
+                CON_ProcessInput(ev.text.text);
+                break;
+
+            case SDL_KEYDOWN:
+                if (ev.key.keysym.sym == SDLK_RETURN) CON_Exec();
+                break;
+            
+            default:
+                break;
+        }
+    }
 }

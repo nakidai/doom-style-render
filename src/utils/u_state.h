@@ -14,6 +14,9 @@ typedef enum {
 typedef struct {
     state_type_t state;
 
+    SDL_Event events[128];
+    usize     event_count;   
+
     bool quit;
     bool sleepy;
 

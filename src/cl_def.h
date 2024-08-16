@@ -22,5 +22,6 @@
 #include "console/c_con.h"
 #include "console/c_draw.h"
 #include "game/gfx/gfx_post_process.h"
+#include "core/keys/k_manager.h"
 
 #endif

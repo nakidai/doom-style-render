@@ -14,6 +14,8 @@ static void CL_Init(int argc, char** argv) {
 
     srand(time(NULL));
 
+    KEY_Init();
+
     W_LoadWAD(&g_cState.wad);
     G_LoadMap(&g_cState.map, "TEST");
 
@@ -21,28 +23,20 @@ static void CL_Init(int argc, char** argv) {
     CON_Init();
     R_Init();
     G_InitPlayer();
+
+    CMD_ExecuteText("exec ../../res/config.cfg");
 }
 
 static void CL_CheckWindowEvents(void) {
+    g_cState.event_count = 0;
     SDL_Event ev;
 
     while (SDL_PollEvent(&ev)) {
+        g_cState.events[g_cState.event_count++] = ev;
+
         switch (ev.type) {
             case SDL_QUIT:
                 g_cState.quit = true;
-                break;
-
-            case SDL_TEXTINPUT:
-                if (g_cState.state != CONSOLE_STATE) break;
-                CON_ProcessInput(ev.text.text);
-                break;
-
-            case SDL_KEYDOWN:
-                if (ev.key.keysym.sym == SDLK_RETURN) CON_Exec();
-                if (ev.key.keysym.sym != SDLK_DELETE) break;
-            
-                if (g_cState.state == CONSOLE_STATE) g_cState.state = LEVEL_STATE;
-                else                                 g_cState.state = CONSOLE_STATE;
                 break;
             
             default:
@@ -67,10 +61,18 @@ static void CL_MainLoop(void) {
 
         g_cState.delta_time = (double) ((now - last) * 1000 / (double) SDL_GetPerformanceFrequency());
 
-        G_UpdatePlayer();
+        KEY_Update();
+        CON_Update();
 
         V_Update();
         R_Render();
+
+        if (g_cState.state == LEVEL_STATE) {
+            G_UpdatePlayer();
+            SDL_ShowCursor(SDL_DISABLE);
+        } else {
+            SDL_ShowCursor(SDL_ENABLE);
+        }
 
         // GFX_Diseling(192, (v2i) { 0, 0 }, (v2i) { SCREEN_WIDTH, SCREEN_HEIGHT });
 

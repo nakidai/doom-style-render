@@ -4,14 +4,70 @@ extern state_t g_cState;
 extern vidstate_t g_cVidstate;
 playerstate_t g_cPlayerstate;
 
+static bool forward = false;
+static bool back    = false;
+static bool left    = false;
+static bool right   = false;
+static bool jump    = false;
+
+int CMD_PlusForward(char* args) {
+    forward = true;
+    return SUCCESS;
+}
+
+int CMD_MinusForward(char* args) {
+    forward = false;
+    return SUCCESS;
+}
+
+int CMD_PlusBack(char* args) {
+    back = true;
+    return SUCCESS;
+}
+
+int CMD_MinusBack(char* args) {
+    back = false;
+    return SUCCESS;
+}
+
+int CMD_PlusLeft(char* args) {
+    left = true;
+    return SUCCESS;
+}
+
+int CMD_MinusLeft(char* args) {
+    left = false;
+    return SUCCESS;
+}
+
+int CMD_PlusRight(char* args) {
+    right = true;
+    return SUCCESS;
+}
+
+int CMD_MinusRight(char* args) {
+    right = false;
+    return SUCCESS;
+}
+
+int CMD_PlusJump(char* args) {
+    jump = true;
+    return SUCCESS;
+}
+
+int CMD_MinusJump(char* args) {
+    jump = false;
+    return SUCCESS;
+}
+
 static void G_PlayerHandleKeys(void) {
     const u8* keystate = SDL_GetKeyboardState(NULL);
-    const f32 move_speed = 0.3f * 0.016f;
+    const f32 move_speed = 0.003f;
 
     g_cPlayerstate.camera.anglecos = cos(g_cPlayerstate.camera.angle);
     g_cPlayerstate.camera.anglesin = sin(g_cPlayerstate.camera.angle);
 
-    if (keystate[SDLK_UP & 0xFFFF]) {
+    if (forward) {
         P_SetVel(
             &g_cPlayerstate.phys_obj,
             (v3) {
@@ -22,7 +78,7 @@ static void G_PlayerHandleKeys(void) {
         );
     }
 
-    if (keystate[SDLK_DOWN & 0xFFFF]) {
+    if (back) {
         P_SetVel(
             &g_cPlayerstate.phys_obj,
             (v3) {
@@ -33,11 +89,44 @@ static void G_PlayerHandleKeys(void) {
         );
     }
 
-    if (keystate[SDLK_LEFT & 0xFFFF] && g_cPlayerstate.phys_obj.pos.z == g_cState.map.sectors.arr[g_cPlayerstate.sector].zfloor) {
+    if (left) {
         P_AddVel(
             &g_cPlayerstate.phys_obj,
             (v3) {
-                0.0f, 0.0f,
+                -(move_speed * g_cPlayerstate.camera.anglesin),
+                (move_speed * g_cPlayerstate.camera.anglecos),
+                0.f
+            }
+        );
+    }
+
+    if (right) {
+        P_AddVel(
+            &g_cPlayerstate.phys_obj,
+            (v3) {
+                (move_speed * g_cPlayerstate.camera.anglesin),
+                -(move_speed * g_cPlayerstate.camera.anglecos),
+                0.f
+            }
+        );
+    }
+
+    g_cPlayerstate.phys_obj.vel.x = clamp(
+        g_cPlayerstate.phys_obj.vel.x,
+        -move_speed, move_speed
+    );
+
+    g_cPlayerstate.phys_obj.vel.y = clamp(
+        g_cPlayerstate.phys_obj.vel.y,
+        -move_speed, move_speed
+    );
+
+    if (jump && g_cPlayerstate.phys_obj.pos.z == g_cState.map.sectors.arr[g_cPlayerstate.sector].zfloor) {
+        P_AddVel(
+            &g_cPlayerstate.phys_obj,
+            (v3) {
+                g_cPlayerstate.phys_obj.vel.x * 0.1f,
+                g_cPlayerstate.phys_obj.vel.y * 0.1f,
                 -GRAVITY + 0.03f
             }
         );
@@ -48,7 +137,7 @@ static void G_PlayerHandleKeys(void) {
     }
 }
 
-#define SENS 0.01f
+#define SENS 0.005f
 #define MIN_VERT_ANG -0.5
 #define MAX_VERT_ANG  0.5
 
@@ -141,6 +230,17 @@ static void G_UpdateEye(void) {
 }
 
 void G_InitPlayer(void) {
+    CMD_AddCommand("+forward", &CMD_PlusForward);
+    CMD_AddCommand("-forward", &CMD_MinusForward);
+    CMD_AddCommand("+back",    &CMD_PlusBack);
+    CMD_AddCommand("-back",    &CMD_MinusBack);
+    CMD_AddCommand("+left",    &CMD_PlusLeft);
+    CMD_AddCommand("-left",    &CMD_MinusLeft);
+    CMD_AddCommand("+right",   &CMD_PlusRight);
+    CMD_AddCommand("-right",   &CMD_MinusRight);
+    CMD_AddCommand("+jump",    &CMD_PlusJump);
+    CMD_AddCommand("-jump",    &CMD_MinusJump);
+
     g_cPlayerstate.sector = 1;
     g_cPlayerstate.phys_obj.pos.x = 3;
     g_cPlayerstate.phys_obj.pos.y = 3;
@@ -148,8 +248,6 @@ void G_InitPlayer(void) {
 
     G_UpdatePlayerSector();
     G_UpdateEye();
-
-    SDL_ShowCursor(SDL_DISABLE);
 }
 
 void G_UpdatePlayer(void) {
@@ -172,6 +270,16 @@ void G_UpdatePlayer(void) {
     g_cPlayerstate.camera.pos.x = g_cPlayerstate.phys_obj.pos.x;
     g_cPlayerstate.camera.pos.y = g_cPlayerstate.phys_obj.pos.y;
     g_cPlayerstate.camera.eye_z = g_cPlayerstate.phys_obj.pos.z + PLAYER_EYE_Z;
+
+    char buf[32];
+    snprintf(
+        buf, sizeof(buf), "UPS: %f, %f, %f",
+        g_cPlayerstate.phys_obj.vel.x,
+        g_cPlayerstate.phys_obj.vel.y,
+        g_cPlayerstate.phys_obj.vel.z
+    );
+
+    CON_DrawString((v2i) { 1, 30 }, buf);
 
     G_UpdatePlayerSector();
 }

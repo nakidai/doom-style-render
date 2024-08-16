@@ -6,6 +6,7 @@
 
 typedef struct {
     v2i a, b;
+    f32 f0, f1;
     int portal;
 } wall_t;
 

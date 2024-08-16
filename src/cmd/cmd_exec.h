@@ -6,6 +6,7 @@
 #define SUCCESS           0
 #define COMMAND_NOT_FOUND 1
 #define VARIABLE          255
+#define COMMENT           256
 
 typedef int (*cmd_fn_t)(char*);
 typedef struct {
@@ -18,6 +19,6 @@ void CMD_Free(void);
 
 void CMD_AddCommand(const char* name, cmd_fn_t func);
 void CMD_AddVariable(cmd_var_t* var);
-int CMD_ExecuteText(char* text);
+int CMD_ExecuteText(const char* text);
 
 #endif
