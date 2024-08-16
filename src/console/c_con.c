@@ -89,16 +89,11 @@ static void CON_ProcessInput(const char* text) {
 static void CON_Exec(void) {
     if (strlen(con_in) == 0) return;
 
-    char* buf_ptr = M_TempAlloc(strlen(con_in));
-    memcpy(buf_ptr, con_in, strlen(con_in));
-    memset(buf_ptr + strlen(con_in), '\0', sizeof(con_in) - strlen(con_in));
-
     char out_buf[32];
-    snprintf(out_buf, sizeof(out_buf), "Command exited with code %i\n", CMD_ExecuteText(buf_ptr));
+    snprintf(out_buf, sizeof(out_buf), "Command exited with code %i\n", CMD_ExecuteText(con_in));
     CON_Printf(out_buf);
 
     memset(con_in, '\0', sizeof(con_in));
-    M_TempFree(buf_ptr);
 }
 
 void CON_Update(void) {
