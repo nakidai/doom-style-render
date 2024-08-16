@@ -44,7 +44,7 @@ int CMD_ToggleConsole(char* args) {
 }
 
 int CMD_ExitCommand(char* args) {
-    g_cState.quit = false;
+    g_cState.quit = true;
     return SUCCESS;
 }
 
