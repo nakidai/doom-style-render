@@ -23,6 +23,7 @@ target_sources(cl_main PRIVATE
     ./console/c_draw.c
     ./cmd/cmd_exec.c
     ./game/gfx/gfx_post_process.c
+    ./core/keys/k_manager.c
 )
 
 if(WIN32)

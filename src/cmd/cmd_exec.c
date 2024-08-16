@@ -30,8 +30,14 @@ void CMD_AddVariable(cmd_var_t* var) {
     cmd_vars[cmd_var_len++] = var;
 }
 
-int CMD_ExecuteText(char* text) {
+int CMD_ExecuteText(const char* in) {
+    if (*in == '#' || in == NULL || *in == '\0') return COMMENT;
+
     int ret = VARIABLE;
+
+    char* text = M_TempAlloc(strlen(in) + 1);
+    memcpy(text, in, strlen(in));
+    text[strlen(in)] = '\0';
 
     const char* name = strtok(text, " ");
 
@@ -59,5 +65,7 @@ int CMD_ExecuteText(char* text) {
 
     ret = COMMAND_NOT_FOUND;
 
-    done: return ret;
+    done:
+        M_TempFree(text);
+        return ret;
 }

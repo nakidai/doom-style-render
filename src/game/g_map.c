@@ -71,13 +71,15 @@ static void G_LoadTextWalls(map_t* map, const char* source) {
     for (usize i = 0; i < array.s; i++) {
         wall_t* wall = &map->walls.arr[i];
         if (sscanf(
-            array.d[i], "%d %d %d %d %d",
+            array.d[i], "%d %d %d %d %d %f %f",
             &wall->a.x,
             &wall->a.y,
             &wall->b.x,
             &wall->b.y,
-            &wall->portal
-        ) != 5) fail = true;
+            &wall->portal,
+            &wall->f0,
+            &wall->f1
+        ) != 7) fail = true;
     }
 
     for (usize i = 0; i < array.s; i++) M_TempFree((void*) array.d[i]);

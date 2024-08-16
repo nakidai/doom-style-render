@@ -144,16 +144,19 @@ void R_Render() {
             const f32 eye_z = g_cPlayerstate.camera.eye_z;
             const f32 vert_angl = g_cPlayerstate.camera.vert_angle * SCREEN_HEIGHT;
 
+            const f32 wall_f0 = wall->f0;
+            const f32 wall_f1 = wall->f1;
+
             const int
-                yf0 = (SCREEN_HEIGHT / 2) + (int)((z_floor - eye_z) * sy0),
+                yf0 = (SCREEN_HEIGHT / 2) + (int)(((z_floor + wall_f0) - eye_z) * sy0),
                 yc0 = (SCREEN_HEIGHT / 2) + (int)((z_ceil - eye_z) * sy0),
-                yf1 = (SCREEN_HEIGHT / 2) + (int)((z_floor - eye_z) * sy1),
+                yf1 = (SCREEN_HEIGHT / 2) + (int)(((z_floor + wall_f1) - eye_z) * sy1),
                 yc1 = (SCREEN_HEIGHT / 2) + (int)((z_ceil - eye_z) * sy1),
                 nyf0 = (SCREEN_HEIGHT / 2) + (int)((nz_floor - eye_z) * sy0),
                 nyc0 = (SCREEN_HEIGHT / 2) + (int)((nz_ceil - eye_z) * sy0),
                 nyf1 = (SCREEN_HEIGHT / 2) + (int)((nz_floor - eye_z) * sy1),
                 nyc1 = (SCREEN_HEIGHT / 2) + (int)((nz_ceil - eye_z) * sy1),
-                txd = tx1 - tx0,
+                txd = tx1 - tx0 ,
                 yfd = yf1 - yf0,
                 ycd = yc1 - yc0,
                 nyfd = nyf1 - nyf0,

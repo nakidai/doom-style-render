@@ -3,8 +3,8 @@
 
 #include "../utils/u_def.h"
 
-#define INIT_WINDOW_W 1280 / 2
-#define INIT_WINDOW_H 720 / 2
+#define INIT_WINDOW_W (int) (1280 / 1.5f)
+#define INIT_WINDOW_H (int) (720 / 1.5f)
 
 typedef struct {
     u32* pixels;
