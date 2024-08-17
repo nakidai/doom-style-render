@@ -20,7 +20,7 @@ extern state_t    g_cState;    // link game state
 extern vidstate_t g_cVidstate; // link video state
 
 // command for toggle console
-int CMD_ToggleConsole(char* args) {
+int CMD_ToggleConsole(void) {
     // if console opened, close, else closed open
     g_cState.state = g_cState.state == CONSOLE_STATE ? LEVEL_STATE : CONSOLE_STATE;
     return SUCCESS;
@@ -36,9 +36,9 @@ int CMD_LoadMap(char* args) {
 void CON_Init(void) {
     CON_DrawInit(); // init char drawing (load charset)
 
-    CMD_AddCommand("toggle_console", &CMD_ToggleConsole); // add toggle console command
-    CMD_AddCommand("map",            &CMD_LoadMap);       // add map console command
-    CMD_AddVariable(&test_variable);                      // add test variable
+    CMD_AddCommand("toggle_console", (cmd_fn_t) &CMD_ToggleConsole); // add toggle console command
+    CMD_AddCommand("map",                       &CMD_LoadMap);       // add map console command
+    CMD_AddVariable(&test_variable);                                 // add test variable
 
     CON_Printf("console init done!\n"); // print done to console
 }

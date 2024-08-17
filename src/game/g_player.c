@@ -10,52 +10,52 @@ static bool left    = false;
 static bool right   = false;
 static bool jump    = false;
 
-int CMD_PlusForward(char* args) {
+int CMD_PlusForward(void) {
     forward = true;
     return SUCCESS;
 }
 
-int CMD_MinusForward(char* args) {
+int CMD_MinusForward(void) {
     forward = false;
     return SUCCESS;
 }
 
-int CMD_PlusBack(char* args) {
+int CMD_PlusBack(void) {
     back = true;
     return SUCCESS;
 }
 
-int CMD_MinusBack(char* args) {
+int CMD_MinusBack(void) {
     back = false;
     return SUCCESS;
 }
 
-int CMD_PlusLeft(char* args) {
+int CMD_PlusLeft(void) {
     left = true;
     return SUCCESS;
 }
 
-int CMD_MinusLeft(char* args) {
+int CMD_MinusLeft(void) {
     left = false;
     return SUCCESS;
 }
 
-int CMD_PlusRight(char* args) {
+int CMD_PlusRight(void) {
     right = true;
     return SUCCESS;
 }
 
-int CMD_MinusRight(char* args) {
+int CMD_MinusRight(void) {
     right = false;
     return SUCCESS;
 }
 
-int CMD_PlusJump(char* args) {
+int CMD_PlusJump(void) {
     jump = true;
     return SUCCESS;
 }
 
-int CMD_MinusJump(char* args) {
+int CMD_MinusJump(void) {
     jump = false;
     return SUCCESS;
 }
@@ -234,16 +234,16 @@ int CMD_SetMaxVertAng(char* args);
 int CMD_SetSens(char* args);
 
 void G_InitPlayer(void) {
-    CMD_AddCommand("+forward", &CMD_PlusForward);
-    CMD_AddCommand("-forward", &CMD_MinusForward);
-    CMD_AddCommand("+back",    &CMD_PlusBack);
-    CMD_AddCommand("-back",    &CMD_MinusBack);
-    CMD_AddCommand("+left",    &CMD_PlusLeft);
-    CMD_AddCommand("-left",    &CMD_MinusLeft);
-    CMD_AddCommand("+right",   &CMD_PlusRight);
-    CMD_AddCommand("-right",   &CMD_MinusRight);
-    CMD_AddCommand("+jump",    &CMD_PlusJump);
-    CMD_AddCommand("-jump",    &CMD_MinusJump);
+    CMD_AddCommand("+forward", (cmd_fn_t) &CMD_PlusForward);
+    CMD_AddCommand("-forward", (cmd_fn_t) &CMD_MinusForward);
+    CMD_AddCommand("+back",    (cmd_fn_t) &CMD_PlusBack);
+    CMD_AddCommand("-back",    (cmd_fn_t) &CMD_MinusBack);
+    CMD_AddCommand("+left",    (cmd_fn_t) &CMD_PlusLeft);
+    CMD_AddCommand("-left",    (cmd_fn_t) &CMD_MinusLeft);
+    CMD_AddCommand("+right",   (cmd_fn_t) &CMD_PlusRight);
+    CMD_AddCommand("-right",   (cmd_fn_t) &CMD_MinusRight);
+    CMD_AddCommand("+jump",    (cmd_fn_t) &CMD_PlusJump);
+    CMD_AddCommand("-jump",    (cmd_fn_t) &CMD_MinusJump);
 
     CMD_AddCommand("cl_sens",         &CMD_SetSens);
     CMD_AddCommand("cl_min_vert_ang", &CMD_SetMinVertAng);
