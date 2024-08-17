@@ -57,6 +57,10 @@ void M_Init(void) {
     printf("M_Init: alloc temp heap\n");
     temp_mem = malloc(temp_size);
 
+    // check for correct allocation
+    if (glob_mem == NULL) ERROR("M_Init: glob heap in NULL");
+    if (temp_mem == NULL) ERROR("M_Init: temp heap is NULL");
+
     // clearing memory buffers
     memset(glob_mem, 0, glob_size);
     memset(temp_mem, 0, temp_size);
