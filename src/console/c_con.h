@@ -1,3 +1,14 @@
+// Copyright (C) by gimura 2024
+// --- PREFIX ---
+//
+// CON_* - console functions
+//
+// --- DESCRIPTION ---
+//
+// engine console
+//
+// -------------------
+
 #ifndef _c_con_h
 #define _c_con_h
 
