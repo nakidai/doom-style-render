@@ -8,6 +8,9 @@
 #define VARIABLE          255
 #define COMMENT           256
 
+#define READ_FLOAT_VAR(x) ({ if (sscanf(args, "%f", &x) != 1) return 2; return SUCCESS; })
+#define READ_INT_VAR(x)   ({ if (sscanf(args, "%i", &x) != 1) return 2; return SUCCESS; })
+
 typedef int (*cmd_fn_t)(char*);
 typedef struct {
     char name[32];
