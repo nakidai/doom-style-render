@@ -18,7 +18,6 @@ typedef struct {
 } cmd_var_t;
 
 void CMD_Init(void);
-void CMD_Free(void);
 
 void CMD_AddCommand(const char* name, cmd_fn_t func);
 void CMD_AddVariable(cmd_var_t* var);

@@ -15,6 +15,13 @@ state_t              g_cState;       // game state
 extern playerstate_t g_cPlayerstate; // player state
 extern vidstate_t    g_cVidstate;    // video state
 
+// console command for exit
+// only for client
+int CMD_ExitCommand(void) {
+    g_cState.quit = true;
+    return SUCCESS;
+}
+
 // client initialization
 static void CL_Init(int argc, char** argv) {
 #   ifdef DEBUG_PRINT_INIT
@@ -31,9 +38,14 @@ static void CL_Init(int argc, char** argv) {
     W_LoadWAD(&g_cState.wad);         // load wad file
     G_LoadMap(&g_cState.map, "TEST"); // load TEST map
 
-    V_Init();   // init video
+    CMD_Init(); // init command executor
     CON_Init(); // init console
+
+    CMD_AddCommand("exit", &CMD_ExitCommand); // add command for exit
+
+    V_Init();   // init video
     R_Init();   // render init
+
     P_Init();   // physics init
     G_InitPlayer(); // player init
 
