@@ -137,9 +137,9 @@ static void G_PlayerHandleKeys(void) {
     }
 }
 
-#define SENS 0.005f
-#define MIN_VERT_ANG -0.5
-#define MAX_VERT_ANG  0.5
+static float sens         = 0.005f;
+static float min_vert_ang = -1.0f;
+static float max_vert_ang =  1.0f;
 
 static void G_HandleMouse(void) {
     int width, height;
@@ -148,9 +148,9 @@ static void G_HandleMouse(void) {
     int x, y;
     SDL_GetMouseState(&x, &y);
 
-    g_cPlayerstate.camera.angle += 0.01f * (width / 2 - x);
-    g_cPlayerstate.camera.vert_angle -= 0.01f * (height / 2 - y);
-    g_cPlayerstate.camera.vert_angle = clamp(g_cPlayerstate.camera.vert_angle, MIN_VERT_ANG, MAX_VERT_ANG);
+    g_cPlayerstate.camera.angle += sens * (width / 2 - x);
+    g_cPlayerstate.camera.vert_angle -= sens * (height / 2 - y);
+    g_cPlayerstate.camera.vert_angle = clamp(g_cPlayerstate.camera.vert_angle, min_vert_ang, max_vert_ang);
 
     SDL_WarpMouseInWindow(g_cVidstate.window, width / 2, height / 2);
 }
@@ -229,6 +229,10 @@ static void G_UpdateEye(void) {
     g_cPlayerstate.camera.eye_z = player_sector->zfloor + PLAYER_EYE_Z;
 }
 
+int CMD_SetMinVertAng(char* args);
+int CMD_SetMaxVertAng(char* args);
+int CMD_SetSens(char* args);
+
 void G_InitPlayer(void) {
     CMD_AddCommand("+forward", &CMD_PlusForward);
     CMD_AddCommand("-forward", &CMD_MinusForward);
@@ -241,10 +245,15 @@ void G_InitPlayer(void) {
     CMD_AddCommand("+jump",    &CMD_PlusJump);
     CMD_AddCommand("-jump",    &CMD_MinusJump);
 
+    CMD_AddCommand("cl_sens",         &CMD_SetSens);
+    CMD_AddCommand("cl_min_vert_ang", &CMD_SetMinVertAng);
+    CMD_AddCommand("cl_max_vert_ang", &CMD_SetMaxVertAng);
+
     g_cPlayerstate.sector = 1;
     g_cPlayerstate.phys_obj.pos.x = 3;
     g_cPlayerstate.phys_obj.pos.y = 3;
     g_cPlayerstate.phys_obj.pos.z = 10;
+    g_cPlayerstate.phys_obj.mass = 1.0f;
 
     G_UpdatePlayerSector();
     G_UpdateEye();
@@ -254,7 +263,6 @@ void G_UpdatePlayer(void) {
     G_HandleMouse();
     G_PlayerHandleKeys();
 
-    P_AddVel(&g_cPlayerstate.phys_obj, (v3) { 0, 0, GRAVITY });
     P_UpdateObject(&g_cPlayerstate.phys_obj);
 
     if (g_cPlayerstate.phys_obj.pos.z < g_cState.map.sectors.arr[g_cPlayerstate.sector].zfloor) {
@@ -285,3 +293,15 @@ void G_UpdatePlayer(void) {
 }
 
 void G_FreePlayer(void) {}
+
+int CMD_SetSens(char* args) {
+    READ_FLOAT_VAR(sens);
+}
+
+int CMD_SetMinVertAng(char* args) {
+    READ_FLOAT_VAR(min_vert_ang);
+}
+
+int CMD_SetMaxVertAng(char* args) {
+    READ_FLOAT_VAR(max_vert_ang);
+}

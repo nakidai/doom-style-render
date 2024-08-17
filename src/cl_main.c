@@ -22,6 +22,7 @@ static void CL_Init(int argc, char** argv) {
     V_Init();
     CON_Init();
     R_Init();
+    P_Init();
     G_InitPlayer();
 
     CMD_ExecuteText("exec ../../res/config.cfg");
