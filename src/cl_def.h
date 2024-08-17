@@ -1,3 +1,10 @@
+// Copyright (C) by gimura 2024
+// --- DESCRIPTION ---
+//
+// all headers included here
+//
+// -------------------
+
 #ifndef _cl_def_h
 #define _cl_def_h
 
