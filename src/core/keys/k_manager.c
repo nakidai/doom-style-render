@@ -24,14 +24,14 @@ int CMD_BindCommand(char* args) {
     const char* key_press_type = strtok(NULL, " ");
     const char* command        = strtok(NULL, "");
 
-    int key_code = NAN;
+    int key_code = (int) NAN;
     if (sscanf(
         key_code_str,
         "%i", &key_code
     ) == 1) goto done;
     if (sscanf(
         key_code_str,
-        "%c", &key_code
+        "%c", (char*) &key_code
     ) == 1) goto done;
     
     if (key_code == NAN) return 2;

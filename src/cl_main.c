@@ -38,7 +38,7 @@ static void CL_Init(int argc, char** argv) {
     CMD_Init(); // init command executor
     CON_Init(); // init console
 
-    CMD_AddCommand("exit", &CMD_ExitCommand); // add command for exit
+    CMD_AddCommand("exit", (cmd_fn_t) &CMD_ExitCommand); // add command for exit
 
     V_Init();   // init video
     R_Init();   // render init
