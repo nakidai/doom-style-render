@@ -11,7 +11,6 @@ target_sources(cl_main PRIVATE
     ./game/g_player.c
     ./game/g_map.c
     ./core/v_vid.c
-    ./core/file/f_wad.c
     ./core/file/f_conf.c
     ./lib/cbmp/cbmp.c
     ./core/mem/m_alloc.c

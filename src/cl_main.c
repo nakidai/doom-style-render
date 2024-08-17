@@ -35,8 +35,7 @@ static void CL_Init(int argc, char** argv) {
 
     KEY_Init(); // init key manager
 
-    W_LoadWAD(&g_cState.wad);         // load wad file
-    G_LoadMap(&g_cState.map, "TEST"); // load TEST map
+    G_LoadMap(&g_cState.map, "test"); // load TEST map
 
     CMD_Init(); // init command executor
     CON_Init(); // init console
@@ -125,7 +124,6 @@ static void CL_Free(void) {
     V_Free();   // free video buffer
     R_Free();   // free renderer
     G_FreePlayer(); // free player
-    W_CloseWAD(&g_cState.wad); // close wad file (free wad buffer)
 
     M_Free(); // free memory manager
 }

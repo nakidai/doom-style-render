@@ -10,7 +10,6 @@
 
 #include "utils/u_def.h"
 #include "game/g_map.h"
-#include "core/file/f_wad.h"
 #include "render/utils/r_texture.h"
 
 // state type
@@ -31,7 +30,6 @@ typedef struct {
 
     f64 delta_time; // delta time
 
-    wad_t wad; // current wad file
     map_t map; // current map
 
     u16 y_lo[SCREEN_WIDTH], y_hi[SCREEN_WIDTH]; // TODO: move it to render state

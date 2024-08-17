@@ -11,7 +11,6 @@ target_sources(me_main PRIVATE
     ./../src/core/mem/m_alloc.c
     ./../src/core/mem/m_utils.c
     ./../src/core/sys.c
-    ./../src/core/file/f_wad.c
     ./../src/core/file/f_conf.c
     ./../src/game/g_map.c
     ./../src/cmd/cmd_exec.c
