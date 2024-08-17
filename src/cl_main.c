@@ -48,7 +48,7 @@ static void CL_Init(int argc, char** argv) {
     P_Init();   // physics init
     G_InitPlayer(); // player init
 
-    CMD_ExecuteText("exec ../../res/config.cfg"); // execute game config
+    CMD_ExecuteText("exec game.cfg"); // execute game config
 }
 
 // process SDL events
