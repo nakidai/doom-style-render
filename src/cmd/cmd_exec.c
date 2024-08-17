@@ -10,12 +10,12 @@ static cmd_var_t* cmd_vars[256] = { NULL };
 static usize      cmd_len     = 0;
 static usize      cmd_var_len = 0;
 
+int CMD_Echo(char* args);
+int CMD_ExecCommand(char* args);
+
 void CMD_Init(void) {
-
-}
-
-void CMD_Free(void) {
-
+    CMD_AddCommand("echo", &CMD_Echo);
+    CMD_AddCommand("exec", &CMD_ExecCommand);
 }
 
 void CMD_AddCommand(const char* name, cmd_fn_t func) {
@@ -67,4 +67,28 @@ int CMD_ExecuteText(const char* in) {
 
     done:
         return ret;
+}
+
+int CMD_Echo(char* args) {
+    char buf[64];
+    snprintf(buf, sizeof(buf), "%s\n", args);
+
+    CON_Printf(buf);
+    return SUCCESS;
+}
+
+int CMD_ExecCommand(char* args) {
+    FILE* file = fopen(args, "r");
+
+    if (file == NULL) return 2;
+
+    char line[64];
+    while (fgets(line, 64, file)) {
+        if (line[strlen(line) - 1] == '\n') line[strlen(line) - 1] = '\0';
+        CMD_ExecuteText(line);
+    }
+
+    fclose(file);
+    
+    return SUCCESS;
 }
