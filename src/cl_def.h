@@ -1,7 +1,7 @@
 // Copyright (C) by gimura 2024
 // --- DESCRIPTION ---
 //
-// all headers included here
+// client headers included here
 //
 // -------------------
 
