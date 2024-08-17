@@ -1,6 +1,14 @@
+// Copyright (C) by gimura 2024
+// --- DESCRIPTION ---
+//
+// types, defines, and etc
+//
+// -------------------
+
 #ifndef _u_def_h
 #define _u_def_h
 
+// including standard libraries
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -10,22 +18,25 @@
 #include <string.h>
 #include <limits.h>
 
+// including SDL
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 #define DLL_EXPORT
 #include <SDL2/SDL_ttf.h>
 
-#define DEV_BUILD
-#define PARANOID
+// spec defines
+#define DEV_BUILD // development build
+#define PARANOID  // more checks
 
 #ifdef DEV_BUILD
 #define DEBUG_PRINT_INIT
 // #define DEBUG_PRINT_RUN
 #endif
 
-#define ERROR(...) ({ fprintf(stderr, __VA_ARGS__); exit(1); })
-#define ASSERT(_e, ...) if (!(_e)) { ERROR(__VA_ARGS__); }
+#define ERROR(...) ({ fprintf(stderr, __VA_ARGS__); exit(1); }) // error macros
+#define ASSERT(_e, ...) if (!(_e)) { ERROR(__VA_ARGS__); }      // assert macros
 
+// new types
 typedef float    f32;
 typedef double   f64;
 typedef uint8_t  u8;
@@ -38,6 +49,7 @@ typedef int32_t  i32;
 typedef int64_t  i64;
 typedef size_t   usize;
 
+// render sizes
 #define SCREEN_WIDTH 384
 #define SCREEN_HEIGHT 216
 
