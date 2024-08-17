@@ -22,7 +22,7 @@
 #include "core/mem/m_utils.h"
 #include "render/draw/r_draw.h"
 #include "core/sys.h"
-#include "utils/u_state.h"
+#include "cl_state.h"
 #include "utils/math/u_math.h"
 #include "cmd/cmd_exec.h"
 #include "game/g_phys.h"
