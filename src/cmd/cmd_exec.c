@@ -101,8 +101,13 @@ int CMD_Echo(char* args) {
 
 // exec command
 int CMD_ExecCommand(char* args) {
-    FILE* file = fopen(args, "r"); // open file in arguments
-    if (file == NULL) return 2; // if file not found, return
+    char  path[64];
+    char* game_dir = SYS_GetGameDir();
+    sprintf(path, "%s%s", game_dir, args);
+    M_TempFree(game_dir);
+
+    FILE* file = fopen(path, "r"); // open file in arguments
+    if (file == NULL) return 2;    // if file not found, return
 
     // execute all lines from file
     char line[64];
