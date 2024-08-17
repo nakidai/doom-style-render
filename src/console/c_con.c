@@ -43,7 +43,7 @@ int CMD_ToggleConsole(char* args) {
     return SUCCESS;
 }
 
-int CMD_ExitCommand(char* args) {
+int CMD_ExitCommand(void) {
     g_cState.quit = true;
     return SUCCESS;
 }
@@ -97,9 +97,7 @@ static void CON_Exec(void) {
 }
 
 void CON_Update(void) {
-    SDL_Event ev;
-
-    for (int i = 0; i < g_cState.event_count; i++) {
+    for (usize i = 0; i < g_cState.event_count; i++) {
         SDL_Event ev = g_cState.events[i];
         
         switch (ev.type) {
