@@ -26,11 +26,18 @@ int CMD_ToggleConsole(char* args) {
     return SUCCESS;
 }
 
+// command for open map
+int CMD_LoadMap(char* args) {
+    G_LoadMap(&g_cState.map, args);
+    return SUCCESS;
+}
+
 // init console
 void CON_Init(void) {
     CON_DrawInit(); // init char drawing (load charset)
 
     CMD_AddCommand("toggle_console", &CMD_ToggleConsole); // add toggle console command
+    CMD_AddCommand("map",            &CMD_LoadMap);       // add map console command
     CMD_AddVariable(&test_variable);                      // add test variable
 
     CON_Printf("console init done!\n"); // print done to console
