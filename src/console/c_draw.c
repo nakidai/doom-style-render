@@ -3,7 +3,7 @@
 static texture_t con_chars;
 
 void CON_DrawInit(void) {
-    T_ReadTexture(&con_chars, "./../../res/chars.bmp");
+    T_ReadTexture(&con_chars, "chars");
 }
 
 void CON_DrawFree(void) {

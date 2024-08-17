@@ -8,7 +8,14 @@ void T_FreeTexture(texture_t* tex) {
     M_GlobFree(tex->data);
 }
 
-void T_ReadTexture(texture_t* tex, const char* path) {
+void T_ReadTexture(texture_t* tex, const char* name) {
+    char  path[64] = { '\0' };
+    char* game_dir = SYS_GetGameDir();
+
+    sprintf(path, "%s%s.bmp", game_dir, name);
+
+    M_TempFree(game_dir);
+
     BMP* bmp = bopen((char*) path);
     tex->size = (v2i) { get_width(bmp), get_height(bmp) };
     T_AllocTexture(tex);
