@@ -35,8 +35,6 @@ static void CL_Init(int argc, char** argv) {
 
     KEY_Init(); // init key manager
 
-    G_LoadMap(&g_cState.map, "test"); // load TEST map
-
     CMD_Init(); // init command executor
     CON_Init(); // init console
 
