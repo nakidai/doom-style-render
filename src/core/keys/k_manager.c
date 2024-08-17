@@ -12,7 +12,7 @@ static usize handlers_len = 0;
 static usize binds_len    = 0;
 
 void KEY_HandleBinds(int code, key_event_t type) {
-    for (int i = 0; i < binds_len; i++) {
+    for (usize i = 0; i < binds_len; i++) {
         if (binds[i].code == code && (binds[i].type == type || binds[i].type == KEY_ANY)) {            
             CMD_ExecuteText(binds[i].command);
         }
@@ -62,12 +62,12 @@ void KEY_Init(void) {
 extern state_t g_cState;
 
 void KEY_Update(void) {
-    for (int i = 0; i < g_cState.event_count; i++) {
+    for (usize i = 0; i < g_cState.event_count; i++) {
         SDL_Event ev = g_cState.events[i];
 
         switch (ev.type) {
             case SDL_KEYDOWN: {
-                for (int j = 0; j < handlers_len; j++) {
+                for (usize j = 0; j < handlers_len; j++) {
                     handlers[j](ev.key.keysym.sym, KEY_DOWN);
                 }
 
@@ -75,7 +75,7 @@ void KEY_Update(void) {
             }
 
             case SDL_KEYUP: {
-                for (int j = 0; j < handlers_len; j++) {
+                for (usize j = 0; j < handlers_len; j++) {
                     handlers[j](ev.key.keysym.sym, KEY_UP);
                 }
 
