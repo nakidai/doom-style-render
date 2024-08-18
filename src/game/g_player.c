@@ -10,52 +10,52 @@ static bool left    = false;
 static bool right   = false;
 static bool jump    = false;
 
-int CMD_PlusForward(void) {
+int CMD_PlusForward(char* args __attribute__((unused))) {
     forward = true;
     return SUCCESS;
 }
 
-int CMD_MinusForward(void) {
+int CMD_MinusForward(char* args __attribute__((unused))) {
     forward = false;
     return SUCCESS;
 }
 
-int CMD_PlusBack(void) {
+int CMD_PlusBack(char* args __attribute__((unused))) {
     back = true;
     return SUCCESS;
 }
 
-int CMD_MinusBack(void) {
+int CMD_MinusBack(char* args __attribute__((unused))) {
     back = false;
     return SUCCESS;
 }
 
-int CMD_PlusLeft(void) {
+int CMD_PlusLeft(char* args __attribute__((unused))) {
     left = true;
     return SUCCESS;
 }
 
-int CMD_MinusLeft(void) {
+int CMD_MinusLeft(char* args __attribute__((unused))) {
     left = false;
     return SUCCESS;
 }
 
-int CMD_PlusRight(void) {
+int CMD_PlusRight(char* args __attribute__((unused))) {
     right = true;
     return SUCCESS;
 }
 
-int CMD_MinusRight(void) {
+int CMD_MinusRight(char* args __attribute__((unused))) {
     right = false;
     return SUCCESS;
 }
 
-int CMD_PlusJump(void) {
+int CMD_PlusJump(char* args __attribute__((unused))) {
     jump = true;
     return SUCCESS;
 }
 
-int CMD_MinusJump(void) {
+int CMD_MinusJump(char* args __attribute__((unused))) {
     jump = false;
     return SUCCESS;
 }
@@ -190,7 +190,7 @@ static void G_UpdatePlayerSector(void) {
             goto done;
         }
 
-        for (int j = sector->firstwall; j < sector->nwalls + sector->firstwall; j++) {
+        for (usize j = sector->firstwall; j < sector->nwalls + sector->firstwall; j++) {
             const wall_t* wall = &client_state.map.walls.arr[j];
 
             if (n_sectors_to_visit >= SECTOR_MAX) goto done;
@@ -221,16 +221,16 @@ int CMD_SetSens(char* args);
 int CMD_TeleportPlayer(char* args);
 
 void G_InitPlayer(void) {
-    CMD_AddCommand("+forward", (cmd_fn_t) &CMD_PlusForward);
-    CMD_AddCommand("-forward", (cmd_fn_t) &CMD_MinusForward);
-    CMD_AddCommand("+back",    (cmd_fn_t) &CMD_PlusBack);
-    CMD_AddCommand("-back",    (cmd_fn_t) &CMD_MinusBack);
-    CMD_AddCommand("+left",    (cmd_fn_t) &CMD_PlusLeft);
-    CMD_AddCommand("-left",    (cmd_fn_t) &CMD_MinusLeft);
-    CMD_AddCommand("+right",   (cmd_fn_t) &CMD_PlusRight);
-    CMD_AddCommand("-right",   (cmd_fn_t) &CMD_MinusRight);
-    CMD_AddCommand("+jump",    (cmd_fn_t) &CMD_PlusJump);
-    CMD_AddCommand("-jump",    (cmd_fn_t) &CMD_MinusJump);
+    CMD_AddCommand("+forward", &CMD_PlusForward);
+    CMD_AddCommand("-forward", &CMD_MinusForward);
+    CMD_AddCommand("+back",    &CMD_PlusBack);
+    CMD_AddCommand("-back",    &CMD_MinusBack);
+    CMD_AddCommand("+left",    &CMD_PlusLeft);
+    CMD_AddCommand("-left",    &CMD_MinusLeft);
+    CMD_AddCommand("+right",   &CMD_PlusRight);
+    CMD_AddCommand("-right",   &CMD_MinusRight);
+    CMD_AddCommand("+jump",    &CMD_PlusJump);
+    CMD_AddCommand("-jump",    &CMD_MinusJump);
 
     CMD_AddCommand("cl_sens",         &CMD_SetSens);
     CMD_AddCommand("cl_min_vert_ang", &CMD_SetMinVertAng);
@@ -296,7 +296,6 @@ int CMD_SetMaxVertAng(char* args) {
 }
 
 int CMD_TeleportPlayer(char* args) {
-    float x, y, z;
     if (sscanf(
         args,
         "%f %f %f",
