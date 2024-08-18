@@ -35,12 +35,10 @@ int MATH_ScreenAngleToX(f32 angle) {
         * (1.0f - tan(((angle + (HFOV / 2.0)) / HFOV) * PI_2 - PI_4));
 }
 
-extern playerstate_t player_state;
-
-v2 MATH_WorldPosToCamera(v2 p) {
-    const v2 u = { p.x - player_state.camera.pos.x, p.y - player_state.camera.pos.y };
+v2 MATH_WorldPosToCamera(v2 p, v2 cam, float as, float ac) {
+    const v2 u = { p.x - cam.x, p.y - cam.y };
     return (v2) {
-        u.x* player_state.camera.anglesin - u.y * player_state.camera.anglecos,
-            u.x* player_state.camera.anglecos + u.y * player_state.camera.anglesin,
+        u.x* as - u.y * ac,
+            u.x* ac + u.y * as,
     };
 }

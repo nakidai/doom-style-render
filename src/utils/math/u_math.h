@@ -29,7 +29,7 @@ typedef struct v3i_s { i32 x, y, z; } v3i;
 
 v2    MATH_IntersectSegs(v2 a0, v2 a1, v2 b0, v2 b1);
 int   MATH_ScreenAngleToX(f32 angle);
-v2    MATH_WorldPosToCamera(v2 p);
+v2    MATH_WorldPosToCamera(v2 p, v2 cam, float as, float ac);
 v2    MATH_Rotate(v2 v, f32 a);
 
 extern u32 MATH_AbgrMul(u32 col, u32 a);
