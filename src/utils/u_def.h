@@ -33,7 +33,12 @@
 // #define DEBUG_PRINT_RUN
 #endif
 
+#ifdef DEV_BUILD
+#define ERROR(...) ({ fprintf(stderr, __VA_ARGS__); __debugbreak(); exit(1); }) // error macros
+#else
 #define ERROR(...) ({ fprintf(stderr, __VA_ARGS__); exit(1); }) // error macros
+#endif
+
 #define ASSERT(_e, ...) if (!(_e)) { ERROR(__VA_ARGS__); }      // assert macros
 
 // new types
