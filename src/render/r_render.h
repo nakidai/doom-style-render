@@ -3,6 +3,7 @@
 
 #include "../utils/u_def.h"
 #include "utils/r_texture.h"
+#include "game/g_player.h"
 
 #define EYE_Z 1.0f
 #define HFOV DEG2RAD(120.0f)
@@ -16,7 +17,7 @@ typedef struct {
 } render_state_t;
 
 void R_Init(void);
-void R_Render(void);
+void R_RenderPlayerView(player_t* player);
 void R_Free(void);
 
 #endif

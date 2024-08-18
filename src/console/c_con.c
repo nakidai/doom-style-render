@@ -16,8 +16,9 @@ static char con_in[32]; // console input buffer
 
 cmd_var_t test_variable = { "test", "this is test variable" }; // variable for testing
 
-extern state_t    client_state; // link game state
-extern vidstate_t g_cVidstate;  // link video state
+extern state_t      client_state; // link game state
+extern vidstate_t   video_state;  // link video state
+extern game_state_t game_state;   // link game state
 
 // command for toggle console
 int CMD_ToggleConsole(char* args __attribute__((unused))) {
@@ -26,18 +27,11 @@ int CMD_ToggleConsole(char* args __attribute__((unused))) {
     return SUCCESS;
 }
 
-// command for open map
-int CMD_LoadMap(char* args) {
-    G_LoadMap(&client_state.map, args);
-    return SUCCESS;
-}
-
 // init console
 void CON_Init(void) {
     CON_DrawInit(); // init char drawing (load charset)
 
     CMD_AddCommand("toggle_console", &CMD_ToggleConsole); // add toggle console command
-    CMD_AddCommand("map",            &CMD_LoadMap);       // add map console command
     CMD_AddVariable(&test_variable);                      // add test variable
 
     CON_Printf("console init done!\n"); // print done to console

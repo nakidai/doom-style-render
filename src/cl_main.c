@@ -11,12 +11,19 @@
 
 #include "cl_def.h"
 
-state_t client_state;   // client state
+state_t             client_state; // client state
+extern game_state_t game_state;   // link game state
 
 // console command for exit
 // only for client
 int CMD_ExitCommand(char* args __attribute__((unused))) {
     client_state.quit = true;
+    return SUCCESS;
+}
+
+// debug interrupt call
+int CMD_DebugBreak(char* args __attribute__((unused))) {
+    __asm__ __volatile__("int {$}3":);
     return SUCCESS;
 }
 
@@ -36,13 +43,13 @@ static void CL_Init(int argc, char** argv) {
     CMD_Init(); // init command executor
     CON_Init(); // init console
 
-    CMD_AddCommand("exit", &CMD_ExitCommand); // add command for exit
+    CMD_AddCommand("exit",        &CMD_ExitCommand); // add command for exit
+    CMD_AddCommand("debug_break", &CMD_DebugBreak);  // add command for debug break
 
     V_Init();   // init video
     R_Init();   // render init
 
-    P_Init();   // physics init
-    G_InitPlayer(); // player init
+    G_Init();   // init game
 
     CMD_ExecuteText("exec game.cfg"); // execute game config
 }
@@ -93,10 +100,10 @@ static void CL_MainLoop(void) {
         CON_Update(); // update console
 
         V_Update(); // update video (clear screen buffer)
-        R_Render(); // render level
+        R_RenderPlayerView(&game_state.player); // render player view
 
         if (client_state.state == LEVEL_STATE) {
-            G_UpdatePlayer(); // if console disabled, update player and etc.
+            G_Update(); // if console disabled, update game
             SDL_ShowCursor(SDL_DISABLE); // don't show cursor
         } else {
             SDL_ShowCursor(SDL_ENABLE); // if console enabled, show cursor
@@ -119,7 +126,6 @@ static void CL_Free(void) {
     CON_Free(); // free console
     V_Free();   // free video buffer
     R_Free();   // free renderer
-    G_FreePlayer(); // free player
 
     M_Free(); // free memory manager
 }

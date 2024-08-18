@@ -30,8 +30,6 @@ typedef struct {
 
     f64 delta_time; // delta time
 
-    map_t map; // current map
-
     u16 y_lo[SCREEN_WIDTH], y_hi[SCREEN_WIDTH]; // TODO: move it to render state
 } state_t;
 

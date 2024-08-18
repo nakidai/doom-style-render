@@ -1,8 +1,8 @@
 #include "../cl_def.h"
 
-render_state_t render_state;
-extern state_t client_state;
-extern playerstate_t player_state;
+render_state_t      render_state;
+extern state_t      client_state;
+extern game_state_t game_state;
 
 void R_Init(void) {
     texture_t* tex = &render_state.textures[0];
@@ -15,7 +15,7 @@ void R_Free(void) {
     T_FreeTexture(&render_state.textures[0]);
 }
 
-void R_Render() {
+void R_RenderPlayerView(player_t* player) {
     for (int i = 0; i < SCREEN_WIDTH; i++) {
         client_state.y_hi[i] = SCREEN_HEIGHT - 1;
         client_state.y_lo[i] = 0;
@@ -38,7 +38,7 @@ void R_Render() {
     struct queue_entry { int id, x0, x1; };
 
     struct { struct queue_entry arr[QUEUE_MAX]; usize n; } queue = {
-        {{ player_state.sector, 0, SCREEN_WIDTH - 1 }},
+        {{ player->sector, 0, SCREEN_WIDTH - 1 }},
         1
     };
 
@@ -56,16 +56,17 @@ void R_Render() {
 
         sectdraw[entry.id]++;
 
-        const sector_t* sector = &client_state.map.sectors.arr[entry.id];
+        const sector_t* sector = &game_state.map.sectors.arr[entry.id];
 
         for (usize i = 0; i < sector->nwalls; i++) {
             const wall_t* wall =
-                &client_state.map.walls.arr[sector->firstwall + i];
+                &game_state.map.walls.arr[sector->firstwall + i];
 
             // translate relative to player and rotate points around player's view
+            const v2 cam_pos = (v2) { player->phys_obj.pos.x, player->phys_obj.pos.y };
             const v2
-                op0 = MATH_WorldPosToCamera(v2i_to_v2(wall->a)),
-                op1 = MATH_WorldPosToCamera(v2i_to_v2(wall->b));
+                op0 = MATH_WorldPosToCamera(v2i_to_v2(wall->a), cam_pos, player->anglesin, player->anglecos),
+                op1 = MATH_WorldPosToCamera(v2i_to_v2(wall->b), cam_pos, player->anglesin, player->anglecos);
 
             // wall clipped pos
             v2 cp0 = op0, cp1 = op1;
@@ -133,16 +134,16 @@ void R_Render() {
                 z_floor = sector->zfloor,
                 z_ceil = sector->zceil,
                 nz_floor =
-                wall->portal ? client_state.map.sectors.arr[wall->portal].zfloor : 0,
+                wall->portal ? game_state.map.sectors.arr[wall->portal].zfloor : 0,
                 nz_ceil =
-                wall->portal ? client_state.map.sectors.arr[wall->portal].zceil : 0;
+                wall->portal ? game_state.map.sectors.arr[wall->portal].zceil : 0;
 
             const f32
                 sy0 = ifnan((VFOV * SCREEN_HEIGHT) / cp0.y, 1e10),
                 sy1 = ifnan((VFOV * SCREEN_HEIGHT) / cp1.y, 1e10);
 
-            const f32 eye_z = player_state.camera.eye_z;
-            const f32 vert_angl = player_state.camera.vert_angle * SCREEN_HEIGHT;
+            const f32 eye_z = player->eye_z;
+            const f32 vert_angl = player->vert_angle * SCREEN_HEIGHT;
 
             const f32 wall_f0 = wall->f0;
             const f32 wall_f1 = wall->f1;

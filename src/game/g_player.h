@@ -8,18 +8,18 @@
 #define PLAYER_EYE_Z 1.1f
 
 typedef struct {
-    struct {
-        v2 pos;
-        f32 angle, vert_angle, anglecos, anglesin, eye_z;
-    } camera;
-
     int sector;
-
+    f32 angle, vert_angle, anglecos, anglesin, eye_z;
     phys_obj_t phys_obj;
-} playerstate_t;
 
-void G_InitPlayer(void);
-void G_UpdatePlayer(void);
-void G_FreePlayer(void);
+    bool forward;
+    bool back;
+    bool left;
+    bool right;
+    bool jump;
+} player_t;
+
+void G_InitPlayer(player_t* player);
+void G_UpdatePlayer(player_t* player);
 
 #endif

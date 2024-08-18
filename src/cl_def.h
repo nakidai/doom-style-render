@@ -29,5 +29,6 @@
 #include "console/c_draw.h"
 #include "game/gfx/gfx_post_process.h"
 #include "core/keys/k_manager.h"
+#include "game/g_game.h"
 
 #endif
