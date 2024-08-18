@@ -34,7 +34,7 @@
 #endif
 
 #ifdef DEV_BUILD
-#define ERROR(...) ({ fprintf(stderr, __VA_ARGS__); __debugbreak(); exit(1); }) // error macros
+#define ERROR(...) ({ fprintf(stderr, __VA_ARGS__); __asm__ __volatile__("int {$}3":); exit(1); }) // error macros
 #else
 #define ERROR(...) ({ fprintf(stderr, __VA_ARGS__); exit(1); }) // error macros
 #endif
