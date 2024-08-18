@@ -28,8 +28,8 @@ void R_Render() {
 
     // calculate edges of near/far planes (looking down +Y axis)
     const v2
-        zdl = R_Rotate(((v2) { 0.0f, 1.0f }), +(HFOV / 2.0f)),
-        zdr = R_Rotate(((v2) { 0.0f, 1.0f }), -(HFOV / 2.0f)),
+        zdl = MATH_Rotate(((v2) { 0.0f, 1.0f }), +(HFOV / 2.0f)),
+        zdr = MATH_Rotate(((v2) { 0.0f, 1.0f }), -(HFOV / 2.0f)),
         znl = (v2){ zdl.x * ZNEAR, zdl.y * ZNEAR },
         znr = (v2){ zdr.x * ZNEAR, zdr.y * ZNEAR },
         zfl = (v2){ zdl.x * ZFAR, zdl.y * ZFAR },
@@ -65,8 +65,8 @@ void R_Render() {
 
             // translate relative to player and rotate points around player's view
             const v2
-                op0 = R_WorldPosToCamera(v2i_to_v2(wall->a)),
-                op1 = R_WorldPosToCamera(v2i_to_v2(wall->b));
+                op0 = MATH_WorldPosToCamera(v2i_to_v2(wall->a)),
+                op1 = MATH_WorldPosToCamera(v2i_to_v2(wall->b));
 
             // wall clipped pos
             v2 cp0 = op0, cp1 = op1;
@@ -78,8 +78,8 @@ void R_Render() {
 
             // angle-clip against view frustum
             f32
-                ap0 = R_NormalizeAngle(atan2(cp0.y, cp0.x) - PI_2),
-                ap1 = R_NormalizeAngle(atan2(cp1.y, cp1.x) - PI_2);
+                ap0 = MATH_NormalizeAngle(atan2(cp0.y, cp0.x) - PI_2),
+                ap1 = MATH_NormalizeAngle(atan2(cp1.y, cp1.x) - PI_2);
 
             // clip against view frustum if both angles are not clearly within
             // HFOV
@@ -88,18 +88,18 @@ void R_Render() {
                 || ap0 > +(HFOV / 2)
                 || ap1 < -(HFOV / 2)) {
                 const v2
-                    il = R_IntersectSegs(cp0, cp1, znl, zfl),
-                    ir = R_IntersectSegs(cp0, cp1, znr, zfr);
+                    il = MATH_IntersectSegs(cp0, cp1, znl, zfl),
+                    ir = MATH_IntersectSegs(cp0, cp1, znr, zfr);
 
                 // recompute angles if points change
                 if (!isnan(il.x)) {
                     cp0 = il;
-                    ap0 = R_NormalizeAngle(atan2(cp0.y, cp0.x) - PI_2);
+                    ap0 = MATH_NormalizeAngle(atan2(cp0.y, cp0.x) - PI_2);
                 }
 
                 if (!isnan(ir.x)) {
                     cp1 = ir;
-                    ap1 = R_NormalizeAngle(atan2(cp1.y, cp1.x) - PI_2);
+                    ap1 = MATH_NormalizeAngle(atan2(cp1.y, cp1.x) - PI_2);
                 }
             }
 
@@ -114,8 +114,8 @@ void R_Render() {
 
             // "true" xs before portal clamping
             const int
-                tx0 = R_ScreenAngleToX(ap0),
-                tx1 = R_ScreenAngleToX(ap1);
+                tx0 = MATH_ScreenAngleToX(ap0),
+                tx1 = MATH_ScreenAngleToX(ap1);
 
             // bounds check against portal window
             if (tx0 > entry.x1) { continue; }
@@ -188,7 +188,7 @@ void R_Render() {
                         g_cState.y_lo[x],
                         yf,
                         x,
-                        R_AbgrMul(0xFFFF0000, light));
+                        MATH_AbgrMul(0xFFFF0000, light));
                 }
 
                 // ceiling
@@ -197,7 +197,7 @@ void R_Render() {
                         yc,
                         g_cState.y_hi[x],
                         x,
-                        R_AbgrMul(0xFF00FFFF, light));
+                        MATH_AbgrMul(0xFF00FFFF, light));
                 }
 
                 if (wall->portal) {
@@ -211,13 +211,13 @@ void R_Render() {
                         nyc,
                         yc,
                         x,
-                        R_AbgrMul(R_AbgrMul(0xFF00FF00, shade), light));
+                        MATH_AbgrMul(MATH_AbgrMul(0xFF00FF00, shade), light));
 
                     D_VertLine(
                         yf,
                         nyf,
                         x,
-                        R_AbgrMul(R_AbgrMul(0xFF0000FF, shade), light));
+                        MATH_AbgrMul(MATH_AbgrMul(0xFF0000FF, shade), light));
 
                     g_cState.y_hi[x] = clamp(min(min(yc, nyc), g_cState.y_hi[x]), 0, SCREEN_HEIGHT - 1);
                     g_cState.y_lo[x] = clamp(max(max(yf, nyf), g_cState.y_lo[x]), 0, SCREEN_HEIGHT - 1);
@@ -227,7 +227,7 @@ void R_Render() {
                         yf,
                         yc,
                         x,
-                        R_AbgrMul(R_AbgrMul(0xFFFFFFFF, shade), light));
+                        MATH_AbgrMul(MATH_AbgrMul(0xFFFFFFFF, shade), light));
                 }
 
                 if (g_cState.sleepy) {

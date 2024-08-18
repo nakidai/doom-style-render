@@ -155,17 +155,16 @@ static void G_HandleMouse(void) {
     SDL_WarpMouseInWindow(g_cVidstate.window, width / 2, height / 2);
 }
 
-static inline float G_PointSide(v2 p, v2i a, v2i b) {
+static inline float MATH_PointSide(v2 p, v2i a, v2i b) {
     return -(((p.x - a.x) * (b.y - a.y))
            - ((p.y - a.y) * (b.x - a.x))); 
 }
 
-// point is in sector if it is on the left side of all walls
-static bool G_PointInSector(const sector_t* sector, v2 p) {
+static bool MATH_PointInSector(const sector_t* sector, v2 p) {
     for (usize i = 0; i < sector->nwalls; i++) {
         const wall_t* _wall = &g_cState.map.walls.arr[sector->firstwall + i];
 
-        if (G_PointSide(p, _wall->a, _wall->b) > 0) {
+        if (MATH_PointSide(p, _wall->a, _wall->b) > 0) {
             return false;
         }
     }
@@ -174,52 +173,39 @@ static bool G_PointInSector(const sector_t* sector, v2 p) {
 }
 
 static void G_UpdatePlayerSector(void) {
-    // BFS neighbors in a circular queue, player is likely to be in one
-    // of the neighboring sectors
-    enum { QUEUE_MAX = 64 };
-    int
-        queue[QUEUE_MAX] = { g_cPlayerstate.sector },
+    int sectors_to_visit[SECTOR_MAX],
+        n_sectors_to_visit = 0,
         i = 0,
-        n = 1,
         found = SECTOR_NONE;
 
-    while (n != 0) {
-        // get front of queue and advance to next
-        const int id = queue[i];
-        i = (i + 1) % (QUEUE_MAX);
-        n--;
+    sectors_to_visit[0] = g_cPlayerstate.sector == SECTOR_NONE ? 1 : g_cPlayerstate.sector;
+    n_sectors_to_visit++;
 
-        const sector_t* sector = &g_cState.map.sectors.arr[id];
+    while (i != n_sectors_to_visit) {
+        const u32 sector_id = sectors_to_visit[i];
+        const sector_t* sector = &g_cState.map.sectors.arr[sector_id];
 
-        if (G_PointInSector(sector, g_cPlayerstate.camera.pos)) {
-            found = id;
-            break;
+        if (MATH_PointInSector(sector, g_cPlayerstate.camera.pos)) {
+            found = sector_id;
+            goto done;
         }
 
-        // check neighbors
-        for (usize j = 0; j < sector->nwalls; j++) {
-            const wall_t* wall =
-                &g_cState.map.walls.arr[sector->firstwall + j];
+        for (int j = sector->firstwall; j < sector->nwalls + sector->firstwall; j++) {
+            const wall_t* wall = &g_cState.map.walls.arr[j];
 
-            if (wall->portal) {
-                if (n == QUEUE_MAX) {
-                    // fprintf(stderr, "out of queue space!");
-                    goto done;
-                }
+            if (n_sectors_to_visit >= SECTOR_MAX) goto done;
 
-                queue[(i + n) % QUEUE_MAX] = wall->portal;
-                n++;
+            if (wall->portal != 0) {
+                sectors_to_visit[n_sectors_to_visit++] = wall->portal;
             }
         }
+
+        i++;
     }
 
     done:
-        if (!found) {
-            // g_cPlayerstate.sector = 1;
-        }
-        else {
-            g_cPlayerstate.sector = found;
-        }
+        if (found == SECTOR_NONE) return;
+        g_cPlayerstate.sector = found;
 }
 
 static void G_UpdateEye(void) {
@@ -232,6 +218,7 @@ static void G_UpdateEye(void) {
 int CMD_SetMinVertAng(char* args);
 int CMD_SetMaxVertAng(char* args);
 int CMD_SetSens(char* args);
+int CMD_TeleportPlayer(char* args);
 
 void G_InitPlayer(void) {
     CMD_AddCommand("+forward", (cmd_fn_t) &CMD_PlusForward);
@@ -248,6 +235,8 @@ void G_InitPlayer(void) {
     CMD_AddCommand("cl_sens",         &CMD_SetSens);
     CMD_AddCommand("cl_min_vert_ang", &CMD_SetMinVertAng);
     CMD_AddCommand("cl_max_vert_ang", &CMD_SetMaxVertAng);
+
+    CMD_AddCommand("pl_tp", &CMD_TeleportPlayer);
 
     g_cPlayerstate.sector = 1;
     g_cPlayerstate.phys_obj.pos.x = 3;
@@ -304,4 +293,17 @@ int CMD_SetMinVertAng(char* args) {
 
 int CMD_SetMaxVertAng(char* args) {
     READ_FLOAT_VAR(max_vert_ang);
+}
+
+int CMD_TeleportPlayer(char* args) {
+    float x, y, z;
+    if (sscanf(
+        args,
+        "%f %f %f",
+        &g_cPlayerstate.phys_obj.pos.x,
+        &g_cPlayerstate.phys_obj.pos.y,
+        &g_cPlayerstate.phys_obj.pos.z
+    ) != 3) return 2;
+
+    return SUCCESS;
 }
