@@ -12,7 +12,7 @@ void P_SetVel(phys_obj_t* obj, v3 vel) {
     obj->vel.z = vel.z;
 }
 
-extern state_t g_cState;
+extern state_t client_state;
 
 static float gravity  = GRAVITY;
 static float slowdown = SLOWDOWN;
@@ -24,9 +24,9 @@ void P_UpdateObject(phys_obj_t* obj) {
 
     P_AddVel(obj, (v3) { 0, 0, gravity * obj->mass });
 
-    obj->pos.x += obj->vel.x * g_cState.delta_time;
-    obj->pos.y += obj->vel.y * g_cState.delta_time;
-    obj->pos.z += obj->vel.z * g_cState.delta_time;
+    obj->pos.x += obj->vel.x * client_state.delta_time;
+    obj->pos.y += obj->vel.y * client_state.delta_time;
+    obj->pos.z += obj->vel.z * client_state.delta_time;
 }
 
 int CMD_SetSlowdown(char* args);

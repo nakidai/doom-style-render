@@ -16,19 +16,19 @@ static char con_in[32]; // console input buffer
 
 cmd_var_t test_variable = { "test", "this is test variable" }; // variable for testing
 
-extern state_t    g_cState;    // link game state
-extern vidstate_t g_cVidstate; // link video state
+extern state_t    client_state; // link game state
+extern vidstate_t g_cVidstate;  // link video state
 
 // command for toggle console
 int CMD_ToggleConsole(void) {
     // if console opened, close, else closed open
-    g_cState.state = g_cState.state == CONSOLE_STATE ? LEVEL_STATE : CONSOLE_STATE;
+    client_state.state = client_state.state == CONSOLE_STATE ? LEVEL_STATE : CONSOLE_STATE;
     return SUCCESS;
 }
 
 // command for open map
 int CMD_LoadMap(char* args) {
-    G_LoadMap(&g_cState.map, args);
+    G_LoadMap(&client_state.map, args);
     return SUCCESS;
 }
 
@@ -87,12 +87,12 @@ static void CON_Exec(void) {
 
 // update console
 void CON_Update(void) {
-    for (usize i = 0; i < g_cState.event_count; i++) {
-        SDL_Event ev = g_cState.events[i]; // get event
+    for (usize i = 0; i < client_state.event_count; i++) {
+        SDL_Event ev = client_state.events[i]; // get event
         
         switch (ev.type) {
             case SDL_TEXTINPUT: // if text input
-                if (g_cState.state != CONSOLE_STATE) break; // if console not opened, break
+                if (client_state.state != CONSOLE_STATE) break; // if console not opened, break
                 CON_ProcessInput(ev.text.text);             // process input
                 break;
 
