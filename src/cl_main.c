@@ -15,7 +15,7 @@ state_t client_state;   // client state
 
 // console command for exit
 // only for client
-int CMD_ExitCommand(void) {
+int CMD_ExitCommand(char* args __attribute__((unused))) {
     client_state.quit = true;
     return SUCCESS;
 }
@@ -36,7 +36,7 @@ static void CL_Init(int argc, char** argv) {
     CMD_Init(); // init command executor
     CON_Init(); // init console
 
-    CMD_AddCommand("exit", (cmd_fn_t) &CMD_ExitCommand); // add command for exit
+    CMD_AddCommand("exit", &CMD_ExitCommand); // add command for exit
 
     V_Init();   // init video
     R_Init();   // render init
