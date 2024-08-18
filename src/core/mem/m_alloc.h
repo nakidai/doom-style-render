@@ -4,7 +4,7 @@
 #include "../../utils/u_def.h"
 #include "m_utils.h"
 
-#define TEMP_HEAP KB(128)
+#define TEMP_HEAP KB(256)
 #define GLOB_HEAP MB(14)
 
 #define TEMP_COLLECT_RATE 25
