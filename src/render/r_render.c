@@ -23,7 +23,7 @@ void R_Render() {
     }
 
     // track if sector has already been drawn
-    bool sectdraw[SECTOR_MAX];
+    u8 sectdraw[SECTOR_MAX];
     memset(sectdraw, 0, sizeof(sectdraw));
 
     // calculate edges of near/far planes (looking down +Y axis)
@@ -50,11 +50,12 @@ void R_Render() {
         // grab tail of queue
         struct queue_entry entry = queue.arr[--queue.n];
 
-        if (sectdraw[entry.id]) {
+        // FIXME: fix algorism for recursive portals
+        if (sectdraw[entry.id] >= 6) {
             continue;
         }
 
-        sectdraw[entry.id] = true;
+        sectdraw[entry.id]++;
 
         const sector_t* sector = &g_cState.map.sectors.arr[entry.id];
 
