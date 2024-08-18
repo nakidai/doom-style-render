@@ -1,25 +1,24 @@
 #include "../cl_def.h"
 
-render_state_t g_cRenderstate;
-extern state_t g_cState;
-extern vidstate_t g_cVidstate;
-extern playerstate_t g_cPlayerstate;
+render_state_t render_state;
+extern state_t client_state;
+extern playerstate_t player_state;
 
 void R_Init(void) {
-    texture_t* tex = &g_cRenderstate.textures[0];
+    texture_t* tex = &render_state.textures[0];
     tex->size = (v2i) { 32, 32 };
     T_AllocTexture(tex);
     T_GenDebugTexture(tex);
 }
 
 void R_Free(void) {
-    T_FreeTexture(&g_cRenderstate.textures[0]);
+    T_FreeTexture(&render_state.textures[0]);
 }
 
 void R_Render() {
     for (int i = 0; i < SCREEN_WIDTH; i++) {
-        g_cState.y_hi[i] = SCREEN_HEIGHT - 1;
-        g_cState.y_lo[i] = 0;
+        client_state.y_hi[i] = SCREEN_HEIGHT - 1;
+        client_state.y_lo[i] = 0;
     }
 
     // track if sector has already been drawn
@@ -39,7 +38,7 @@ void R_Render() {
     struct queue_entry { int id, x0, x1; };
 
     struct { struct queue_entry arr[QUEUE_MAX]; usize n; } queue = {
-        {{ g_cPlayerstate.sector, 0, SCREEN_WIDTH - 1 }},
+        {{ player_state.sector, 0, SCREEN_WIDTH - 1 }},
         1
     };
 
@@ -57,11 +56,11 @@ void R_Render() {
 
         sectdraw[entry.id]++;
 
-        const sector_t* sector = &g_cState.map.sectors.arr[entry.id];
+        const sector_t* sector = &client_state.map.sectors.arr[entry.id];
 
         for (usize i = 0; i < sector->nwalls; i++) {
             const wall_t* wall =
-                &g_cState.map.walls.arr[sector->firstwall + i];
+                &client_state.map.walls.arr[sector->firstwall + i];
 
             // translate relative to player and rotate points around player's view
             const v2
@@ -134,16 +133,16 @@ void R_Render() {
                 z_floor = sector->zfloor,
                 z_ceil = sector->zceil,
                 nz_floor =
-                wall->portal ? g_cState.map.sectors.arr[wall->portal].zfloor : 0,
+                wall->portal ? client_state.map.sectors.arr[wall->portal].zfloor : 0,
                 nz_ceil =
-                wall->portal ? g_cState.map.sectors.arr[wall->portal].zceil : 0;
+                wall->portal ? client_state.map.sectors.arr[wall->portal].zceil : 0;
 
             const f32
                 sy0 = ifnan((VFOV * SCREEN_HEIGHT) / cp0.y, 1e10),
                 sy1 = ifnan((VFOV * SCREEN_HEIGHT) / cp1.y, 1e10);
 
-            const f32 eye_z = g_cPlayerstate.camera.eye_z;
-            const f32 vert_angl = g_cPlayerstate.camera.vert_angle * SCREEN_HEIGHT;
+            const f32 eye_z = player_state.camera.eye_z;
+            const f32 vert_angl = player_state.camera.vert_angle * SCREEN_HEIGHT;
 
             const f32 wall_f0 = wall->f0;
             const f32 wall_f1 = wall->f1;
@@ -177,25 +176,25 @@ void R_Render() {
                 const int
                     tyf = (int)(xp * yfd) + yf0,
                     tyc = (int)(xp * ycd) + yc0,
-                    yf = clamp(tyf + vert_angl, g_cState.y_lo[x], g_cState.y_hi[x]),
-                    yc = clamp(tyc + vert_angl, g_cState.y_lo[x], g_cState.y_hi[x]);
+                    yf = clamp(tyf + vert_angl, client_state.y_lo[x], client_state.y_hi[x]),
+                    yc = clamp(tyc + vert_angl, client_state.y_lo[x], client_state.y_hi[x]);
 
                 const u8 light = sector->light;
 
                 // floor
-                if (yf > g_cState.y_lo[x]) {
+                if (yf > client_state.y_lo[x]) {
                     D_VertLine(
-                        g_cState.y_lo[x],
+                        client_state.y_lo[x],
                         yf,
                         x,
                         MATH_AbgrMul(0xFFFF0000, light));
                 }
 
                 // ceiling
-                if (yc < g_cState.y_hi[x]) {
+                if (yc < client_state.y_hi[x]) {
                     D_VertLine(
                         yc,
-                        g_cState.y_hi[x],
+                        client_state.y_hi[x],
                         x,
                         MATH_AbgrMul(0xFF00FFFF, light));
                 }
@@ -204,8 +203,8 @@ void R_Render() {
                     const int
                         tnyf = (int)(xp * nyfd) + nyf0,
                         tnyc = (int)(xp * nycd) + nyc0,
-                        nyf = clamp(tnyf + vert_angl, g_cState.y_lo[x], g_cState.y_hi[x]),
-                        nyc = clamp(tnyc + vert_angl, g_cState.y_lo[x], g_cState.y_hi[x]);
+                        nyf = clamp(tnyf + vert_angl, client_state.y_lo[x], client_state.y_hi[x]),
+                        nyc = clamp(tnyc + vert_angl, client_state.y_lo[x], client_state.y_hi[x]);
 
                     D_VertLine(
                         nyc,
@@ -219,8 +218,8 @@ void R_Render() {
                         x,
                         MATH_AbgrMul(MATH_AbgrMul(0xFF0000FF, shade), light));
 
-                    g_cState.y_hi[x] = clamp(min(min(yc, nyc), g_cState.y_hi[x]), 0, SCREEN_HEIGHT - 1);
-                    g_cState.y_lo[x] = clamp(max(max(yf, nyf), g_cState.y_lo[x]), 0, SCREEN_HEIGHT - 1);
+                    client_state.y_hi[x] = clamp(min(min(yc, nyc), client_state.y_hi[x]), 0, SCREEN_HEIGHT - 1);
+                    client_state.y_lo[x] = clamp(max(max(yf, nyf), client_state.y_lo[x]), 0, SCREEN_HEIGHT - 1);
                 }
                 else {
                     D_VertLine(
@@ -230,7 +229,7 @@ void R_Render() {
                         MATH_AbgrMul(MATH_AbgrMul(0xFFFFFFFF, shade), light));
                 }
 
-                if (g_cState.sleepy) {
+                if (client_state.sleepy) {
                     V_Present();
                     SDL_Delay(10);
                 }
@@ -247,5 +246,5 @@ void R_Render() {
         }
     }
 
-    g_cState.sleepy = false;
+    client_state.sleepy = false;
 }

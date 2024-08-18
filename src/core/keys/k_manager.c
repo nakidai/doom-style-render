@@ -59,11 +59,11 @@ void KEY_Init(void) {
     CMD_AddCommand("bind", &CMD_BindCommand);
 }
 
-extern state_t g_cState;
+extern state_t client_state;
 
 void KEY_Update(void) {
-    for (usize i = 0; i < g_cState.event_count; i++) {
-        SDL_Event ev = g_cState.events[i];
+    for (usize i = 0; i < client_state.event_count; i++) {
+        SDL_Event ev = client_state.events[i];
 
         switch (ev.type) {
             case SDL_KEYDOWN: {

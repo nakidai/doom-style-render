@@ -1,6 +1,6 @@
 #include "../cl_def.h"
 
-vidstate_t g_cVidstate;
+vidstate_t video_state;
 u32*       g_pVidbuf;
 
 void V_Init(void) {
@@ -10,7 +10,7 @@ void V_Init(void) {
         SDL_GetError()
     );
 
-    g_cVidstate.window = SDL_CreateWindow(
+    video_state.window = SDL_CreateWindow(
         "Haltura engine",
         SDL_WINDOWPOS_CENTERED_DISPLAY(0),
         SDL_WINDOWPOS_CENTERED_DISPLAY(0),
@@ -20,62 +20,62 @@ void V_Init(void) {
     );
 
     ASSERT(
-        g_cVidstate.window != NULL,
+        video_state.window != NULL,
         "V_Init: failed to create SDL window: %s",
         SDL_GetError()
     );
 
-    g_cVidstate.renderer = SDL_CreateRenderer(
-        g_cVidstate.window,
+    video_state.renderer = SDL_CreateRenderer(
+        video_state.window,
         -1,
         SDL_RENDERER_ACCELERATED |
         SDL_RENDERER_PRESENTVSYNC
     );
 
-    g_cVidstate.texture = SDL_CreateTexture(
-        g_cVidstate.renderer,
+    video_state.texture = SDL_CreateTexture(
+        video_state.renderer,
         SDL_PIXELFORMAT_ABGR8888,
         SDL_TEXTUREACCESS_STREAMING,
         SCREEN_WIDTH,
         SCREEN_HEIGHT
     );
 
-    g_cVidstate.debug = SDL_CreateTexture(
-        g_cVidstate.renderer,
+    video_state.debug = SDL_CreateTexture(
+        video_state.renderer,
         SDL_PIXELFORMAT_ABGR8888,
         SDL_TEXTUREACCESS_TARGET,
         128,
         128
     );
 
-    g_cVidstate.pixels = M_GlobAlloc(SCREEN_WIDTH * SCREEN_HEIGHT * 4);
-    g_pVidbuf = g_cVidstate.pixels;
+    video_state.pixels = M_GlobAlloc(SCREEN_WIDTH * SCREEN_HEIGHT * 4);
+    g_pVidbuf = video_state.pixels;
 }
 
 void V_Present(void) {
     void* px;
     int pitch;
 
-    SDL_LockTexture(g_cVidstate.texture, NULL, &px, &pitch);
+    SDL_LockTexture(video_state.texture, NULL, &px, &pitch);
     {
         for (usize y = 0; y < SCREEN_HEIGHT; y++) {
             memcpy(
                 &((u8*)px)[y * pitch],
-                &g_cVidstate.pixels[y * SCREEN_WIDTH],
+                &video_state.pixels[y * SCREEN_WIDTH],
                 SCREEN_WIDTH * 4
             );
         }
     }
-    SDL_UnlockTexture(g_cVidstate.texture);
+    SDL_UnlockTexture(video_state.texture);
 
-    SDL_SetRenderTarget(g_cVidstate.renderer, NULL);
-    SDL_SetRenderDrawColor(g_cVidstate.renderer, 0, 0, 0, 0xFF);
-    SDL_SetRenderDrawBlendMode(g_cVidstate.renderer, SDL_BLENDMODE_NONE);
+    SDL_SetRenderTarget(video_state.renderer, NULL);
+    SDL_SetRenderDrawColor(video_state.renderer, 0, 0, 0, 0xFF);
+    SDL_SetRenderDrawBlendMode(video_state.renderer, SDL_BLENDMODE_NONE);
 
-    SDL_RenderClear(g_cVidstate.renderer);
+    SDL_RenderClear(video_state.renderer);
     SDL_RenderCopyEx(
-        g_cVidstate.renderer,
-        g_cVidstate.texture,
+        video_state.renderer,
+        video_state.texture,
         NULL,
         NULL,
         0.0,
@@ -83,22 +83,22 @@ void V_Present(void) {
         SDL_FLIP_VERTICAL
     );
 
-    SDL_SetTextureBlendMode(g_cVidstate.debug, SDL_BLENDMODE_BLEND);
-    SDL_RenderCopy(g_cVidstate.renderer, g_cVidstate.debug, NULL, &((SDL_Rect) { 0, 0, 512, 512 }));
-    SDL_RenderPresent(g_cVidstate.renderer);
+    SDL_SetTextureBlendMode(video_state.debug, SDL_BLENDMODE_BLEND);
+    SDL_RenderCopy(video_state.renderer, video_state.debug, NULL, &((SDL_Rect) { 0, 0, 512, 512 }));
+    SDL_RenderPresent(video_state.renderer);
 }
 
 void V_Update(void) {
 #   ifdef DEV_BUILD
-    memset(g_cVidstate.pixels, 0, SCREEN_WIDTH * SCREEN_HEIGHT * 4);
+    memset(video_state.pixels, 0, SCREEN_WIDTH * SCREEN_HEIGHT * 4);
 #   endif
 }
 
 void V_Free(void) {
-    SDL_DestroyTexture(g_cVidstate.debug);
-    SDL_DestroyTexture(g_cVidstate.texture);
-    SDL_DestroyRenderer(g_cVidstate.renderer);
-    SDL_DestroyWindow(g_cVidstate.window);
+    SDL_DestroyTexture(video_state.debug);
+    SDL_DestroyTexture(video_state.texture);
+    SDL_DestroyRenderer(video_state.renderer);
+    SDL_DestroyWindow(video_state.window);
 
-    M_GlobFree(g_cVidstate.pixels);
+    M_GlobFree(video_state.pixels);
 }

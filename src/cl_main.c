@@ -11,14 +11,12 @@
 
 #include "cl_def.h"
 
-state_t              g_cState;       // game state
-extern playerstate_t g_cPlayerstate; // player state
-extern vidstate_t    g_cVidstate;    // video state
+state_t client_state;   // client state
 
 // console command for exit
 // only for client
 int CMD_ExitCommand(void) {
-    g_cState.quit = true;
+    client_state.quit = true;
     return SUCCESS;
 }
 
@@ -51,17 +49,17 @@ static void CL_Init(int argc, char** argv) {
 
 // process SDL events
 static void CL_CheckWindowEvents(void) {
-    g_cState.event_count = 0; // sets event count no zero 
+    client_state.event_count = 0; // sets event count no zero 
     SDL_Event ev;             // variable for event
 
     // event check loop
     while (SDL_PollEvent(&ev)) {
-        g_cState.events[g_cState.event_count++] = ev; // write event to event array
+        client_state.events[client_state.event_count++] = ev; // write event to event array
 
         // check type
         switch (ev.type) {
             case SDL_QUIT: // if window close event, quit
-                g_cState.quit = true;
+                client_state.quit = true;
                 break;
             
             default: // else other, continue
@@ -77,11 +75,11 @@ static void CL_MainLoop(void) {
         last = 0;
 
     // main loop
-    while (!g_cState.quit) {
+    while (!client_state.quit) {
         CL_CheckWindowEvents(); // process events
 
         // if quit in true, break
-        if (g_cState.quit) {
+        if (client_state.quit) {
             break;
         }
 
@@ -89,7 +87,7 @@ static void CL_MainLoop(void) {
         last = now;
         now = SDL_GetPerformanceCounter();
 
-        g_cState.delta_time = (double) ((now - last) * 1000 / (double) SDL_GetPerformanceFrequency());
+        client_state.delta_time = (double) ((now - last) * 1000 / (double) SDL_GetPerformanceFrequency());
 
         KEY_Update(); // process keys
         CON_Update(); // update console
@@ -97,7 +95,7 @@ static void CL_MainLoop(void) {
         V_Update(); // update video (clear screen buffer)
         R_Render(); // render level
 
-        if (g_cState.state == LEVEL_STATE) {
+        if (client_state.state == LEVEL_STATE) {
             G_UpdatePlayer(); // if console disabled, update player and etc.
             SDL_ShowCursor(SDL_DISABLE); // don't show cursor
         } else {
@@ -106,9 +104,9 @@ static void CL_MainLoop(void) {
 
         // GFX_Diseling(192, (v2i) { 0, 0 }, (v2i) { SCREEN_WIDTH, SCREEN_HEIGHT });
 
-        if (g_cState.state == CONSOLE_STATE) CON_Draw(); // drawing console
+        if (client_state.state == CONSOLE_STATE) CON_Draw(); // drawing console
 
-        if (!g_cState.sleepy) { V_Present(); }
+        if (!client_state.sleepy) { V_Present(); }
     }
 }
 

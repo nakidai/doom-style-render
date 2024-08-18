@@ -1,8 +1,8 @@
 #include "../cl_def.h"
 
-extern state_t g_cState;
-extern vidstate_t g_cVidstate;
-playerstate_t g_cPlayerstate;
+extern state_t client_state;
+extern vidstate_t video_state;
+playerstate_t player_state;
 
 static bool forward = false;
 static bool back    = false;
@@ -64,37 +64,37 @@ static void G_PlayerHandleKeys(void) {
     const u8* keystate = SDL_GetKeyboardState(NULL);
     const f32 move_speed = 0.003f;
 
-    g_cPlayerstate.camera.anglecos = cos(g_cPlayerstate.camera.angle);
-    g_cPlayerstate.camera.anglesin = sin(g_cPlayerstate.camera.angle);
+    player_state.camera.anglecos = cos(player_state.camera.angle);
+    player_state.camera.anglesin = sin(player_state.camera.angle);
 
     if (forward) {
         P_SetVel(
-            &g_cPlayerstate.phys_obj,
+            &player_state.phys_obj,
             (v3) {
-                (move_speed * g_cPlayerstate.camera.anglecos),
-                (move_speed * g_cPlayerstate.camera.anglesin),
-                g_cPlayerstate.phys_obj.vel.z,
+                (move_speed * player_state.camera.anglecos),
+                (move_speed * player_state.camera.anglesin),
+                player_state.phys_obj.vel.z,
             }
         );
     }
 
     if (back) {
         P_SetVel(
-            &g_cPlayerstate.phys_obj,
+            &player_state.phys_obj,
             (v3) {
-                -(move_speed * g_cPlayerstate.camera.anglecos),
-                -(move_speed * g_cPlayerstate.camera.anglesin),
-                g_cPlayerstate.phys_obj.vel.z,
+                -(move_speed * player_state.camera.anglecos),
+                -(move_speed * player_state.camera.anglesin),
+                player_state.phys_obj.vel.z,
             }
         );
     }
 
     if (left) {
         P_AddVel(
-            &g_cPlayerstate.phys_obj,
+            &player_state.phys_obj,
             (v3) {
-                -(move_speed * g_cPlayerstate.camera.anglesin),
-                (move_speed * g_cPlayerstate.camera.anglecos),
+                -(move_speed * player_state.camera.anglesin),
+                (move_speed * player_state.camera.anglecos),
                 0.f
             }
         );
@@ -102,38 +102,38 @@ static void G_PlayerHandleKeys(void) {
 
     if (right) {
         P_AddVel(
-            &g_cPlayerstate.phys_obj,
+            &player_state.phys_obj,
             (v3) {
-                (move_speed * g_cPlayerstate.camera.anglesin),
-                -(move_speed * g_cPlayerstate.camera.anglecos),
+                (move_speed * player_state.camera.anglesin),
+                -(move_speed * player_state.camera.anglecos),
                 0.f
             }
         );
     }
 
-    g_cPlayerstate.phys_obj.vel.x = clamp(
-        g_cPlayerstate.phys_obj.vel.x,
+    player_state.phys_obj.vel.x = clamp(
+        player_state.phys_obj.vel.x,
         -move_speed, move_speed
     );
 
-    g_cPlayerstate.phys_obj.vel.y = clamp(
-        g_cPlayerstate.phys_obj.vel.y,
+    player_state.phys_obj.vel.y = clamp(
+        player_state.phys_obj.vel.y,
         -move_speed, move_speed
     );
 
-    if (jump && g_cPlayerstate.phys_obj.pos.z == g_cState.map.sectors.arr[g_cPlayerstate.sector].zfloor) {
+    if (jump && player_state.phys_obj.pos.z == client_state.map.sectors.arr[player_state.sector].zfloor) {
         P_AddVel(
-            &g_cPlayerstate.phys_obj,
+            &player_state.phys_obj,
             (v3) {
-                g_cPlayerstate.phys_obj.vel.x * 0.1f,
-                g_cPlayerstate.phys_obj.vel.y * 0.1f,
+                player_state.phys_obj.vel.x * 0.1f,
+                player_state.phys_obj.vel.y * 0.1f,
                 -GRAVITY + 0.03f
             }
         );
     }
 
     if (keystate[SDLK_F1 & 0xFFFF]) {
-        g_cState.sleepy = true;
+        client_state.sleepy = true;
     }
 }
 
@@ -143,16 +143,16 @@ static float max_vert_ang =  1.0f;
 
 static void G_HandleMouse(void) {
     int width, height;
-    SDL_GetWindowSize(g_cVidstate.window, &width, &height);
+    SDL_GetWindowSize(video_state.window, &width, &height);
 
     int x, y;
     SDL_GetMouseState(&x, &y);
 
-    g_cPlayerstate.camera.angle += sens * (width / 2 - x);
-    g_cPlayerstate.camera.vert_angle -= sens * (height / 2 - y);
-    g_cPlayerstate.camera.vert_angle = clamp(g_cPlayerstate.camera.vert_angle, min_vert_ang, max_vert_ang);
+    player_state.camera.angle += sens * (width / 2 - x);
+    player_state.camera.vert_angle -= sens * (height / 2 - y);
+    player_state.camera.vert_angle = clamp(player_state.camera.vert_angle, min_vert_ang, max_vert_ang);
 
-    SDL_WarpMouseInWindow(g_cVidstate.window, width / 2, height / 2);
+    SDL_WarpMouseInWindow(video_state.window, width / 2, height / 2);
 }
 
 static inline float MATH_PointSide(v2 p, v2i a, v2i b) {
@@ -162,7 +162,7 @@ static inline float MATH_PointSide(v2 p, v2i a, v2i b) {
 
 static bool MATH_PointInSector(const sector_t* sector, v2 p) {
     for (usize i = 0; i < sector->nwalls; i++) {
-        const wall_t* _wall = &g_cState.map.walls.arr[sector->firstwall + i];
+        const wall_t* _wall = &client_state.map.walls.arr[sector->firstwall + i];
 
         if (MATH_PointSide(p, _wall->a, _wall->b) > 0) {
             return false;
@@ -178,20 +178,20 @@ static void G_UpdatePlayerSector(void) {
         i = 0,
         found = SECTOR_NONE;
 
-    sectors_to_visit[0] = g_cPlayerstate.sector == SECTOR_NONE ? 1 : g_cPlayerstate.sector;
+    sectors_to_visit[0] = player_state.sector == SECTOR_NONE ? 1 : player_state.sector;
     n_sectors_to_visit++;
 
     while (i != n_sectors_to_visit) {
         const u32 sector_id = sectors_to_visit[i];
-        const sector_t* sector = &g_cState.map.sectors.arr[sector_id];
+        const sector_t* sector = &client_state.map.sectors.arr[sector_id];
 
-        if (MATH_PointInSector(sector, g_cPlayerstate.camera.pos)) {
+        if (MATH_PointInSector(sector, player_state.camera.pos)) {
             found = sector_id;
             goto done;
         }
 
         for (int j = sector->firstwall; j < sector->nwalls + sector->firstwall; j++) {
-            const wall_t* wall = &g_cState.map.walls.arr[j];
+            const wall_t* wall = &client_state.map.walls.arr[j];
 
             if (n_sectors_to_visit >= SECTOR_MAX) goto done;
 
@@ -205,14 +205,14 @@ static void G_UpdatePlayerSector(void) {
 
     done:
         if (found == SECTOR_NONE) return;
-        g_cPlayerstate.sector = found;
+        player_state.sector = found;
 }
 
 static void G_UpdateEye(void) {
-    const int sector_id = g_cPlayerstate.sector;
-    const sector_t* player_sector = &g_cState.map.sectors.arr[sector_id];
+    const int sector_id = player_state.sector;
+    const sector_t* player_sector = &client_state.map.sectors.arr[sector_id];
 
-    g_cPlayerstate.camera.eye_z = player_sector->zfloor + PLAYER_EYE_Z;
+    player_state.camera.eye_z = player_sector->zfloor + PLAYER_EYE_Z;
 }
 
 int CMD_SetMinVertAng(char* args);
@@ -238,11 +238,11 @@ void G_InitPlayer(void) {
 
     CMD_AddCommand("pl_tp", &CMD_TeleportPlayer);
 
-    g_cPlayerstate.sector = 1;
-    g_cPlayerstate.phys_obj.pos.x = 3;
-    g_cPlayerstate.phys_obj.pos.y = 3;
-    g_cPlayerstate.phys_obj.pos.z = 10;
-    g_cPlayerstate.phys_obj.mass = 1.0f;
+    player_state.sector = 1;
+    player_state.phys_obj.pos.x = 3;
+    player_state.phys_obj.pos.y = 3;
+    player_state.phys_obj.pos.z = 10;
+    player_state.phys_obj.mass = 1.0f;
 
     G_UpdatePlayerSector();
     G_UpdateEye();
@@ -252,28 +252,28 @@ void G_UpdatePlayer(void) {
     G_HandleMouse();
     G_PlayerHandleKeys();
 
-    P_UpdateObject(&g_cPlayerstate.phys_obj);
+    P_UpdateObject(&player_state.phys_obj);
 
-    if (g_cPlayerstate.phys_obj.pos.z < g_cState.map.sectors.arr[g_cPlayerstate.sector].zfloor) {
-        g_cPlayerstate.phys_obj.vel.z = 0;
-        g_cPlayerstate.phys_obj.pos.z = g_cState.map.sectors.arr[g_cPlayerstate.sector].zfloor;
+    if (player_state.phys_obj.pos.z < client_state.map.sectors.arr[player_state.sector].zfloor) {
+        player_state.phys_obj.vel.z = 0;
+        player_state.phys_obj.pos.z = client_state.map.sectors.arr[player_state.sector].zfloor;
     }
 
-    if (g_cPlayerstate.phys_obj.pos.z + PLAYER_EYE_Z > g_cState.map.sectors.arr[g_cPlayerstate.sector].zceil) {
-        g_cPlayerstate.phys_obj.vel.z = 0;
-        g_cPlayerstate.phys_obj.pos.z = g_cState.map.sectors.arr[g_cPlayerstate.sector].zceil - PLAYER_EYE_Z;
+    if (player_state.phys_obj.pos.z + PLAYER_EYE_Z > client_state.map.sectors.arr[player_state.sector].zceil) {
+        player_state.phys_obj.vel.z = 0;
+        player_state.phys_obj.pos.z = client_state.map.sectors.arr[player_state.sector].zceil - PLAYER_EYE_Z;
     }
 
-    g_cPlayerstate.camera.pos.x = g_cPlayerstate.phys_obj.pos.x;
-    g_cPlayerstate.camera.pos.y = g_cPlayerstate.phys_obj.pos.y;
-    g_cPlayerstate.camera.eye_z = g_cPlayerstate.phys_obj.pos.z + PLAYER_EYE_Z;
+    player_state.camera.pos.x = player_state.phys_obj.pos.x;
+    player_state.camera.pos.y = player_state.phys_obj.pos.y;
+    player_state.camera.eye_z = player_state.phys_obj.pos.z + PLAYER_EYE_Z;
 
     char buf[32];
     snprintf(
         buf, sizeof(buf), "UPS: %f, %f, %f",
-        g_cPlayerstate.phys_obj.vel.x,
-        g_cPlayerstate.phys_obj.vel.y,
-        g_cPlayerstate.phys_obj.vel.z
+        player_state.phys_obj.vel.x,
+        player_state.phys_obj.vel.y,
+        player_state.phys_obj.vel.z
     );
 
     CON_DrawString((v2i) { 1, 30 }, buf);
@@ -300,9 +300,9 @@ int CMD_TeleportPlayer(char* args) {
     if (sscanf(
         args,
         "%f %f %f",
-        &g_cPlayerstate.phys_obj.pos.x,
-        &g_cPlayerstate.phys_obj.pos.y,
-        &g_cPlayerstate.phys_obj.pos.z
+        &player_state.phys_obj.pos.x,
+        &player_state.phys_obj.pos.y,
+        &player_state.phys_obj.pos.z
     ) != 3) return 2;
 
     return SUCCESS;
