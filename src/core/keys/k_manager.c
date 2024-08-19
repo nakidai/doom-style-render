@@ -40,7 +40,7 @@ static int CMD_BindCommand(char* args) {
     const char* command        = strtok(NULL, "");  // get command
 
     // get key code with a char or scan code integer
-    int key_code = (int) NAN; // FIXME: why it working only with NAN?
+    int key_code = 0;
     if (sscanf(
         key_code_str,
         "%i", &key_code
@@ -50,7 +50,7 @@ static int CMD_BindCommand(char* args) {
         "%c", (char*) &key_code
     ) == 1) goto done;
     
-    if (key_code == NAN) return 2; // if don't read, exit
+    return 2; // if don't read, exit
 
     done:;
 
