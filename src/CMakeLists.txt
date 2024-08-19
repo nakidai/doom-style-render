@@ -24,6 +24,7 @@ target_sources(cl_main PRIVATE
     ./game/gfx/gfx_post_process.c
     ./core/keys/k_manager.c
     ./game/g_game.c
+    ./render/draw/r_draw.c
 )
 
 if(WIN32)
@@ -43,10 +44,8 @@ endif()
 
 # Assembly code only for x86-64
 if ((CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)") AND WIN32)
-    target_sources(cl_main PRIVATE ./render/draw/asm/x86/win/win_x86_64.s)
     # target_sources(cl_main PRIVATE ./utils/math/asm/x86/win/win_x86_64.s)
     target_sources(cl_main PRIVATE ./utils/math/asm/c_impl.c) # TODO: fix asebmler implementation
 else()
-    target_sources(cl_main PRIVATE ./render/draw/r_draw.c)
     target_sources(cl_main PRIVATE ./utils/math/asm/c_impl.c)
 endif()
