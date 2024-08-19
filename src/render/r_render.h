@@ -4,6 +4,7 @@
 #include "../utils/u_def.h"
 #include "utils/r_texture.h"
 #include "game/g_player.h"
+#include "game/g_map.h"
 
 #define EYE_Z 1.0f
 #define HFOV DEG2RAD(120.0f)
@@ -14,10 +15,11 @@
 
 typedef struct {
     texture_t textures[256];
+    u16 y_lo[SCREEN_WIDTH], y_hi[SCREEN_WIDTH];
 } render_state_t;
 
 void R_Init(void);
-void R_RenderPlayerView(player_t* player);
+void R_RenderPlayerView(player_t* player, map_t* map);
 void R_Free(void);
 
 #endif

@@ -114,7 +114,7 @@ void G_Update(void) {
 }
 
 void G_Render(void) {
-    R_RenderPlayerView(&game_state.player); // render player view
+    R_RenderPlayerView(&game_state.player, &game_state.map); // render player view
 }
 
 void G_Free(void) {
