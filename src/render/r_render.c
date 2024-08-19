@@ -1,8 +1,6 @@
 #include "../cl_def.h"
 
-render_state_t      render_state;
-extern state_t      client_state;
-extern game_state_t game_state;
+render_state_t render_state;
 
 void R_Init(void) {
     texture_t* tex = &render_state.textures[0];
@@ -15,10 +13,10 @@ void R_Free(void) {
     T_FreeTexture(&render_state.textures[0]);
 }
 
-void R_RenderPlayerView(player_t* player) {
+void R_RenderPlayerView(player_t* player, map_t* map) {
     for (int i = 0; i < SCREEN_WIDTH; i++) {
-        client_state.y_hi[i] = SCREEN_HEIGHT - 1;
-        client_state.y_lo[i] = 0;
+        render_state.y_hi[i] = SCREEN_HEIGHT - 1;
+        render_state.y_lo[i] = 0;
     }
 
     // track if sector has already been drawn
@@ -56,11 +54,11 @@ void R_RenderPlayerView(player_t* player) {
 
         sectdraw[entry.id]++;
 
-        const sector_t* sector = &game_state.map.sectors.arr[entry.id];
+        const sector_t* sector = &map->sectors.arr[entry.id];
 
         for (usize i = 0; i < sector->nwalls; i++) {
             const wall_t* wall =
-                &game_state.map.walls.arr[sector->firstwall + i];
+                &map->walls.arr[sector->firstwall + i];
 
             // translate relative to player and rotate points around player's view
             const v2 cam_pos = (v2) { player->phys_obj.pos.x, player->phys_obj.pos.y };
@@ -134,9 +132,9 @@ void R_RenderPlayerView(player_t* player) {
                 z_floor = sector->zfloor,
                 z_ceil = sector->zceil,
                 nz_floor =
-                wall->portal ? game_state.map.sectors.arr[wall->portal].zfloor : 0,
+                wall->portal ? map->sectors.arr[wall->portal].zfloor : 0,
                 nz_ceil =
-                wall->portal ? game_state.map.sectors.arr[wall->portal].zceil : 0;
+                wall->portal ? map->sectors.arr[wall->portal].zceil : 0;
 
             const f32
                 sy0 = ifnan((VFOV * SCREEN_HEIGHT) / cp0.y, 1e10),
@@ -177,25 +175,25 @@ void R_RenderPlayerView(player_t* player) {
                 const int
                     tyf = (int)(xp * yfd) + yf0,
                     tyc = (int)(xp * ycd) + yc0,
-                    yf = clamp(tyf + vert_angl, client_state.y_lo[x], client_state.y_hi[x]),
-                    yc = clamp(tyc + vert_angl, client_state.y_lo[x], client_state.y_hi[x]);
+                    yf = clamp(tyf + vert_angl, render_state.y_lo[x], render_state.y_hi[x]),
+                    yc = clamp(tyc + vert_angl, render_state.y_lo[x], render_state.y_hi[x]);
 
                 const u8 light = sector->light;
 
                 // floor
-                if (yf > client_state.y_lo[x]) {
+                if (yf > render_state.y_lo[x]) {
                     D_VertLine(
-                        client_state.y_lo[x],
+                        render_state.y_lo[x],
                         yf,
                         x,
                         MATH_AbgrMul(0xFFFF0000, light));
                 }
 
                 // ceiling
-                if (yc < client_state.y_hi[x]) {
+                if (yc < render_state.y_hi[x]) {
                     D_VertLine(
                         yc,
-                        client_state.y_hi[x],
+                        render_state.y_hi[x],
                         x,
                         MATH_AbgrMul(0xFF00FFFF, light));
                 }
@@ -204,8 +202,8 @@ void R_RenderPlayerView(player_t* player) {
                     const int
                         tnyf = (int)(xp * nyfd) + nyf0,
                         tnyc = (int)(xp * nycd) + nyc0,
-                        nyf = clamp(tnyf + vert_angl, client_state.y_lo[x], client_state.y_hi[x]),
-                        nyc = clamp(tnyc + vert_angl, client_state.y_lo[x], client_state.y_hi[x]);
+                        nyf = clamp(tnyf + vert_angl, render_state.y_lo[x], render_state.y_hi[x]),
+                        nyc = clamp(tnyc + vert_angl, render_state.y_lo[x], render_state.y_hi[x]);
 
                     D_VertLine(
                         nyc,
@@ -219,8 +217,8 @@ void R_RenderPlayerView(player_t* player) {
                         x,
                         MATH_AbgrMul(MATH_AbgrMul(0xFF0000FF, shade), light));
 
-                    client_state.y_hi[x] = clamp(min(min(yc, nyc), client_state.y_hi[x]), 0, SCREEN_HEIGHT - 1);
-                    client_state.y_lo[x] = clamp(max(max(yf, nyf), client_state.y_lo[x]), 0, SCREEN_HEIGHT - 1);
+                    render_state.y_hi[x] = clamp(min(min(yc, nyc), render_state.y_hi[x]), 0, SCREEN_HEIGHT - 1);
+                    render_state.y_lo[x] = clamp(max(max(yf, nyf), render_state.y_lo[x]), 0, SCREEN_HEIGHT - 1);
                 }
                 else {
                     D_VertLine(
@@ -228,11 +226,6 @@ void R_RenderPlayerView(player_t* player) {
                         yc,
                         x,
                         MATH_AbgrMul(MATH_AbgrMul(0xFFFFFFFF, shade), light));
-                }
-
-                if (client_state.sleepy) {
-                    V_Present();
-                    SDL_Delay(10);
                 }
             }
 
@@ -246,6 +239,4 @@ void R_RenderPlayerView(player_t* player) {
             }
         }
     }
-
-    client_state.sleepy = false;
 }

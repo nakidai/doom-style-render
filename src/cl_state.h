@@ -26,8 +26,6 @@ typedef struct {
     bool sleepy;  // TODO: remove this and create console command
 
     f64 delta_time; // delta time
-
-    u16 y_lo[SCREEN_WIDTH], y_hi[SCREEN_WIDTH]; // TODO: move it to render state
 } state_t;
 
 #endif
