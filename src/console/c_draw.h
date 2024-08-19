@@ -1,14 +1,25 @@
+// Copyright (C) by gimura 2024
+// --- PREFIX ---
+//
+// CON_* - console functions
+//
+// --- DESCRIPTION ---
+//
+// char drawing
+//
+// -------------------
+
 #ifndef _c_draw_h
 #define _c_draw_h
 
 #include "utils/u_def.h"
 
-#define CHAR_SIZE 16
+#define CHAR_SIZE 16 // char size in char set
 
-void CON_DrawInit(void);
-void CON_DrawFree(void);
+void CON_DrawInit(void); // load char set
+void CON_DrawFree(void); // free char set texture
 
-void CON_DrawChar(v2i pos, const char c);
-void CON_DrawString(v2i pos, const char* text);
+void CON_DrawChar(v2i pos, const char c);       // char drawing
+void CON_DrawString(v2i pos, const char* text); // string drawing
 
 #endif
