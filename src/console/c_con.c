@@ -14,26 +14,12 @@
 char con_buf[1024];     // console output buffer
 static char con_in[32]; // console input buffer
 
-cmd_var_t test_variable = { "test", "this is test variable" }; // variable for testing
-
-extern state_t      client_state; // link game state
 extern vidstate_t   video_state;  // link video state
 extern game_state_t game_state;   // link game state
-
-// command for toggle console
-int CMD_ToggleConsole(char* args __attribute__((unused))) {
-    // if console opened, close, else closed open
-    client_state.state = client_state.state == CONSOLE_STATE ? LEVEL_STATE : CONSOLE_STATE;
-    return SUCCESS;
-}
 
 // init console
 void CON_Init(void) {
     CON_DrawInit(); // init char drawing (load charset)
-
-    CMD_AddCommand("toggle_console", &CMD_ToggleConsole); // add toggle console command
-    CMD_AddVariable(&test_variable);                      // add test variable
-
     CON_Printf("console init done!\n"); // print done to console
 }
 
@@ -79,15 +65,17 @@ static void CON_Exec(void) {
     memset(con_in, '\0', sizeof(con_in));
 }
 
+extern usize     event_count; // app event count
+extern SDL_Event events[128]; // app event list
+
 // update console
 void CON_Update(void) {
-    for (usize i = 0; i < client_state.event_count; i++) {
-        SDL_Event ev = client_state.events[i]; // get event
+    for (usize i = 0; i < event_count; i++) {
+        SDL_Event ev = events[i]; // get event
         
         switch (ev.type) {
             case SDL_TEXTINPUT: // if text input
-                if (client_state.state != CONSOLE_STATE) break; // if console not opened, break
-                CON_ProcessInput(ev.text.text);             // process input
+                CON_ProcessInput(ev.text.text); // process input
                 break;
 
             case SDL_KEYDOWN: // if key down

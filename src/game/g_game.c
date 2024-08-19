@@ -103,6 +103,7 @@ static void G_Tick(void) {
 }
 
 void G_Update(void) {
+    // TODO: move player angle calculation to player class
     player_t* player = &game_state.player;
 
     player->anglecos = cos(player->angle);
@@ -110,6 +111,10 @@ void G_Update(void) {
 
     G_HandleMouse();
     if ((SDL_GetTicks() % (100 / TICK_RATE)) == 0) G_Tick();
+}
+
+void G_Render(void) {
+    R_RenderPlayerView(&game_state.player); // render player view
 }
 
 void G_Free(void) {

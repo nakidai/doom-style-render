@@ -15,7 +15,10 @@ typedef struct {
 } game_state_t;
 
 void G_Init(void);
+
 void G_Update(void);
+void G_Render(void);
+
 void G_Free(void);
 
 #endif
