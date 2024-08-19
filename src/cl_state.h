@@ -14,19 +14,16 @@
 
 // state type
 typedef enum {
-    LEVEL_STATE,   // level state
-    CONSOLE_STATE, // console opened
+    GS_LEVEL,   // level state
 } state_type_t;
 
 // state structure
 typedef struct {
     state_type_t state; // state type
 
-    SDL_Event events[128]; // events
-    usize     event_count; // event count
-
-    bool quit;   // is game quit?
-    bool sleepy; // TODO: remove this and create console command
+    bool quit;    // is game quit?
+    bool console; // is console opened?
+    bool sleepy;  // TODO: remove this and create console command
 
     f64 delta_time; // delta time
 
