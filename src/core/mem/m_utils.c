@@ -1,3 +1,14 @@
+// Copyright (C) by gimura 2024
+// --- PREFIX ---
+//
+// M_* - memory functions
+//
+// --- DESCRIPTION ---
+//
+// memory utils
+//
+// -------------------
+
 #include "../../cl_def.h"
 
 // reading size from string
