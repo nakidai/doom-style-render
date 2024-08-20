@@ -24,15 +24,6 @@
 #define DLL_EXPORT
 #include <SDL2/SDL_ttf.h>
 
-// spec defines
-#define DEV_BUILD // development build
-#define PARANOID  // more checks
-
-#ifdef DEV_BUILD
-#define DEBUG_PRINT_INIT
-// #define DEBUG_PRINT_RUN
-#endif
-
 #ifdef DEV_BUILD
 #define ERROR(...) ({ fprintf(stderr, __VA_ARGS__); __asm__ __volatile__("int {$}3":); exit(1); }) // error macros
 #else
