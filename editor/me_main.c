@@ -1,239 +1,229 @@
-#include "cl_def.h"
-#include "me_cmds.h"
-#include <SDL2/SDL_test.h>
+#include "me_def.h"
 
-state_t       g_cState;
-SDL_Renderer* renderer;
-TTF_Font*     font;
+usize     event_count = 0; // app event count
+SDL_Event events[128];     // app event list
+bool      quit = false;
 
-v2i   points[64];
-usize point_count = 0;
+editor_state_t    editor_state;
+extern vidstate_t video_state;
 
-float scale = 50.0f;
-v2 pos =      { 0, 0 };
+static void ME_DrawLine(v2i a, v2i b, u32 color) {
+    a.x = clamp(a.x, 1, SCREEN_WIDTH);
+    a.y = clamp(a.y, 1, SCREEN_HEIGHT);
 
-static void ME_DrawString(int x, int y, const char* line) {
-#   ifndef __WIN32
-    SDL_Color color = { 255, 255, 255, 255 };
-    SDL_Surface *surf = TTF_RenderText_Blended(font, line, color);
-    if (surf == NULL) ERROR("ME_DrawString: kakoito error");
+    b.x = clamp(b.x, 1, SCREEN_WIDTH);
+    b.y = clamp(b.y, 1, SCREEN_HEIGHT);
 
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surf);
-    if (texture == NULL) ERROR("ME_DrawString: kakoito error");
+    int x1 = floor(a.x);
+    int x2 = floor(b.x);
 
-    SDL_FreeSurface(surf);
-    
-    SDL_Rect rect;
-    rect.x = x;
-    rect.y = y;
-    rect.w = 24 * strlen(line);
-    rect.h = 24;
+    if (x1 > x2) {
+        int temp_i = x1;
+        x1 = x2;
+        x2 = temp_i;
 
-    SDL_RenderCopy(renderer, texture, NULL, &rect);
-#   else
-    SDLTest_DrawString(renderer, x, y, line);
-#   endif
-}
-
-bool draw_wall_num = false;
-bool draw_sect_num = true;
-int  selected_wall = -1;
-int  selected_point = -1;
-
-static void ME_Render(void) {
-    for (int i = 0; i < point_count; i++) {
-        SDL_Rect rect;
-        rect.x = (points[i].x + pos.x) * (int) scale;
-        rect.y = (points[i].y + pos.y) * (int) scale;
-        rect.w = 5;
-        rect.h = 5;
-
-        if (i == selected_point) SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
-        else                     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
-        SDL_RenderDrawRect(renderer, &rect);
+        v2i temp_v = a;
+        a = b;
+        b = temp_v;
     }
 
-    for (int i = 0; i < g_cState.map.walls.n; i++) {
-        const wall_t* wall = &g_cState.map.walls.arr[i];
+    float d = (b.y - a.y) / clamp(x2 - x1, 1, SCREEN_WIDTH);
+    float y = a.y;
+    
+    for (register int i = x1; i <= x2; i++) {
+        int pix_y = floor(y);
+        video_state.pixels[pix_y * SCREEN_WIDTH + i] = color;
+        y += d;
+    }
+}
 
-        if (wall->portal == 0)  SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        else                    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-        if (i == selected_wall) SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+#define GIRD_SIZE 512
 
-        SDL_RenderDrawLine(
-            renderer,
-            (wall->a.x + pos.x) * (int) scale,
-            (wall->a.y + pos.y) * (int) scale,
-
-            (wall->b.x + pos.x) * (int) scale,
-            (wall->b.y + pos.y) * (int) scale
+static void ME_DrawGrid(void) {
+    for (int i = 0; i < GIRD_SIZE; i += editor_state.grid_res) {
+        D_VertLine(
+            clamp(editor_state.pix_pos.y,             0, SCREEN_HEIGHT),
+            clamp(editor_state.pix_pos.y + GIRD_SIZE, 0, SCREEN_HEIGHT),
+            clamp(editor_state.pix_pos.x + i,         0, SCREEN_WIDTH),
+            0xFFFFFFFF
         );
 
-        if (draw_wall_num) {
-            SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
-
-            v2i center = { 0, 0 };
-            center.x += wall->a.x;
-            center.y += wall->a.y;
-            center.x += wall->b.x;
-            center.y += wall->b.y;
-
-            center.x /= 2;
-            center.y /= 2;
-
-            char num[10];
-            sprintf(num, "%i", i);
-
-            ME_DrawString(
-                (center.x + pos.x) * (int) scale,
-                (center.y + pos.y) * (int) scale,
-                num
-            );
-        }
-    }
-
-    if (draw_sect_num) {
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-
-        for (int i = 1; i < g_cState.map.sectors.n; i++) {
-            const sector_t* sector = &g_cState.map.sectors.arr[i];
-            v2i center = { 0, 0 };
-
-            for (int j = sector->firstwall; j < sector->nwalls + sector->firstwall; j++) {
-                const wall_t* wall = &g_cState.map.walls.arr[j];
-
-                center.x += wall->a.x;
-                center.y += wall->a.y;
-                center.x += wall->b.x;
-                center.y += wall->b.y;
-            }
-
-            center.x /= sector->nwalls * 2;
-            center.y /= sector->nwalls * 2;
-
-            char num[10];
-            sprintf(num, "%i", sector->id);
-
-            ME_DrawString(
-                (center.x + pos.x) * (int) scale,
-                (center.y + pos.y) * (int) scale,
-                num
-            );
-        }
+        D_HorsLine(
+            clamp(editor_state.pix_pos.x,             0, SCREEN_WIDTH),
+            clamp(editor_state.pix_pos.x + GIRD_SIZE, 0, SCREEN_WIDTH),
+            clamp(editor_state.pix_pos.y + i,         0, SCREEN_HEIGHT),
+            0xFFFFFFFF
+        );
     }
 }
 
-#define MOVE_SPEED 0.4f
+static void ME_DrawMap(void) {
+    for (int i = 0; i < editor_state.walls.n; i++) {
+        const wall_t* wall = &editor_state.walls.arr[i];
 
-static void ME_ProcessEvents(void) {
-    SDL_PumpEvents();
-    const u8* keystate = SDL_GetKeyboardState(NULL);
-
-    if (keystate[SDLK_UP & 0xFFFF])    pos.y += MOVE_SPEED;
-    if (keystate[SDLK_DOWN & 0xFFFF])  pos.y -= MOVE_SPEED;
-    if (keystate[SDLK_LEFT & 0xFFFF])  pos.x += MOVE_SPEED;
-    if (keystate[SDLK_RIGHT & 0xFFFF]) pos.x -= MOVE_SPEED;
+        ME_DrawLine(
+            (v2i) {
+                clamp(wall->a.x + editor_state.pix_pos.x, 0, SCREEN_WIDTH),
+                clamp(wall->a.y + editor_state.pix_pos.y, 0, SCREEN_HEIGHT),
+            },
+            (v2i) {
+                clamp(wall->b.x + editor_state.pix_pos.x, 0, SCREEN_WIDTH),
+                clamp(wall->b.y + editor_state.pix_pos.y, 0, SCREEN_HEIGHT),
+            },
+            0xFF00FF00
+        );
+    }
 }
 
-static char console_buf[64] = {};
-static char con_out_buf[64] = {};
+static void ME_Draw(void) {
+    ME_DrawGrid();
+    ME_DrawMap();
+}
 
-int main(int argc, char* argv[]) {
+#define MOVE_CMD(x, y) ({ x = y; return SUCCESS; })
+#define P_MOV(x) MOVE_CMD(x, true)
+#define M_MOV(x) MOVE_CMD(x, false)
+
+static int CMD_PlusForward(char* args __attribute__((unused)))  { P_MOV(editor_state.forward); }
+static int CMD_MinusForward(char* args __attribute__((unused))) { M_MOV(editor_state.forward); }
+
+static int CMD_PlusBack(char* args __attribute__((unused)))  { P_MOV(editor_state.back); }
+static int CMD_MinusBack(char* args __attribute__((unused))) { M_MOV(editor_state.back); }
+
+static int CMD_PlusLeft(char* args __attribute__((unused)))  { P_MOV(editor_state.left); }
+static int CMD_MinusLeft(char* args __attribute__((unused))) { M_MOV(editor_state.left); }
+
+static int CMD_PlusRight(char* args __attribute__((unused)))  { P_MOV(editor_state.right); }
+static int CMD_MinusRight(char* args __attribute__((unused))) { M_MOV(editor_state.right); }
+
+static int CMD_ToggleConsole(char* args __attribute__((unused))) {
+    editor_state.console = !editor_state.console;
+    return SUCCESS;
+}
+
+static int CMD_ToggleConsole(char* args) {
+    if (strcmp(args, "cursor") == 0) {
+        
+    }
+
+    return SUCCESS;
+}
+
+static void ME_InitCommands(void) {
+    CMD_AddCommand("+forward", &CMD_PlusForward);
+    CMD_AddCommand("-forward", &CMD_MinusForward);
+    CMD_AddCommand("+back",    &CMD_PlusBack);
+    CMD_AddCommand("-back",    &CMD_MinusBack);
+    CMD_AddCommand("+left",    &CMD_PlusLeft);
+    CMD_AddCommand("-left",    &CMD_MinusLeft);
+    CMD_AddCommand("+right",   &CMD_PlusRight);
+    CMD_AddCommand("-right",   &CMD_MinusRight);
+
+    CMD_AddCommand("toggle_console", &CMD_ToggleConsole);
+}
+
+static void ME_Init(int argc, char** argv) {
     SYS_Init(argc, argv);
     M_Init();
+
+    KEY_Init();
+
     CMD_Init();
+    CON_Init();
+    ME_InitCommands();
 
-    g_cState.map.sectors.n = 1;
+    V_Init();
+    R_Init();
 
-    ASSERT(
-        !SDL_Init(SDL_INIT_VIDEO),
-        "V_Init: SDL init error: %s",
-        SDL_GetError()
-    );
-
-#   ifndef __WIN32
-    TTF_Init();
-    font = TTF_OpenFont("./../../res/Sans.ttf", 24);
-#   endif
-
-    SDL_Window* window = SDL_CreateWindow(
-        "Haltura editor",
-        SDL_WINDOWPOS_CENTERED_DISPLAY(0),
-        SDL_WINDOWPOS_CENTERED_DISPLAY(0),
-        INIT_WINDOW_W,
-        INIT_WINDOW_H,
+    editor_state.grid_res = 30;
+    editor_state.walls.arr[editor_state.walls.n++] = (wall_t) {
+        (v2i) { 0, 0 },
+        (v2i) { 40, 50 },
         0
-    );
+    };
 
-    ASSERT(
-        window != NULL,
-        "V_Init: failed to create SDL window: %s",
-        SDL_GetError()
-    );
+    CMD_ExecuteText("exec editor.cfg");
+}
 
-    renderer = SDL_CreateRenderer(
-        window,
-        -1,
-        SDL_RENDERER_ACCELERATED |
-        SDL_RENDERER_PRESENTVSYNC
-    );
+// process SDL events
+static void CL_CheckWindowEvents(void) {
+    event_count = 0; // sets event count no zero 
+    SDL_Event ev;    // variable for event
 
-    W_LoadWAD(&g_cState.wad);
-    ME_SetupCommands();
+    // event check loop
+    while (SDL_PollEvent(&ev)) {
+        events[event_count++] = ev; // write event to event array
 
-    while (true) {
-        SDL_Event ev;
-
-        while (SDL_PollEvent(&ev)) {
-            switch (ev.type) {
-                case SDL_QUIT: goto exit;
-                case SDL_TEXTINPUT:
-                    strcat(console_buf, ev.text.text);
-                    break;
-
-                case SDL_KEYDOWN: {
-                    if (ev.key.keysym.sym != SDLK_RETURN) break;
-
-                    printf("push command: %s\n", console_buf);
-
-                    char* buf_ptr = M_TempAlloc(strlen(console_buf));
-                    memcpy(buf_ptr, console_buf, strlen(console_buf));
-                    memset(buf_ptr + strlen(console_buf), '\0', sizeof(console_buf) - strlen(console_buf));
-
-                    snprintf(
-                        con_out_buf,
-                        sizeof(con_out_buf),
-                        "Command exited with code %i",
-                        CMD_ExecuteText(buf_ptr)
-                    );
-                    M_TempFree(buf_ptr);
-                    memset(console_buf, '\0', sizeof(console_buf));
-
-                    break;
-                }
-
-                default: break;
-            }
-        } 
-
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
-
-        ME_Render();
-
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        ME_DrawString(10, 10, console_buf);
-        ME_DrawString(10, 20, con_out_buf);
-
-        ME_ProcessEvents();
-
-        SDL_RenderPresent(renderer);
+        // check type
+        switch (ev.type) {
+            case SDL_QUIT: // if window close event, quit
+                quit = true;
+                break;
+            
+            default: // else other, continue
+                break;
+        }
     }
+}
 
-    exit:
+#define MOVE_SPEED 0.8f
+
+static void ME_MoveCamera(void) {
+    if (editor_state.forward) editor_state.pos.y -= MOVE_SPEED;
+    if (editor_state.back)    editor_state.pos.y += MOVE_SPEED;
+    if (editor_state.left)    editor_state.pos.x += MOVE_SPEED;
+    if (editor_state.right)   editor_state.pos.x -= MOVE_SPEED;
+
+    editor_state.pix_pos.x = (int) editor_state.pos.x;
+    editor_state.pix_pos.y = (int) editor_state.pos.y;
+}
+
+static void ME_MainLoop(void) {
+    // init variable for calculate delta time
+    u64 now = SDL_GetPerformanceCounter(),
+        last = 0;
+
+    // main loop
+    while (!quit) {
+        CL_CheckWindowEvents(); // process events
+
+        // if quit in true, break
+        if (quit) {
+            break;
+        }
+
+        // calculate delta time
+        last = now;
+        now = SDL_GetPerformanceCounter();
+
+        KEY_Update(); // process keys
+
+        V_Update(); // update video (clear screen buffer)
+
+        if (editor_state.console) {
+            CON_Update();
+            CON_Draw();
+        }
+
+        ME_Draw();
+        ME_MoveCamera();
+
+        V_Present();
+    }
+}
+
+static void ME_Free(void) {
+    CON_Free();
+    R_Free();
+    V_Free();
     
     M_Free();
-    CMD_Init();
+}
+
+int main(int argc, char* argv[]) {
+    ME_Init(argc, argv);
+    ME_MainLoop();
+    ME_Free();
+
     return 0;
 }
