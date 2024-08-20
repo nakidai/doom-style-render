@@ -4,15 +4,23 @@ extern state_t      client_state;
 extern vidstate_t   video_state;
 extern game_state_t game_state;
 
-#define PLAYER_SPEED 0.1f
-#define JUMP_IMPULSE 0.6f
+#define MIN_PLAYER_SPEED    0.1f
+#define REGULAR_IMPULSE     0.004f
+#define FLOOR_JUMP_BOX_SIZE 0.05f
+#define JUMP_IMPULSE        0.2f
 
 static void G_MovePlayer(player_t* player) {
-    P_UpdateObject(&player->phys_obj);
-
     const sector_t* player_sector = &game_state.map.sectors.arr[player->sector];
+
     v3* pos = &player->phys_obj.pos;
     v3* vel = &player->phys_obj.vel;
+
+    phys_obj_t* phys_obj = &player->phys_obj;
+
+    const bool floored = pos->z <= player_sector->zfloor + FLOOR_JUMP_BOX_SIZE;
+    phys_obj->floored = floored;
+
+    P_UpdateObject(phys_obj);
 
     if (pos->z < player_sector->zfloor) {
         vel->z = 0;
@@ -24,70 +32,58 @@ static void G_MovePlayer(player_t* player) {
         pos->z = player_sector->zceil - PLAYER_EYE_Z;
     }
 
-    if (player->forward) {
-        P_SetVel(
-            &player->phys_obj,
-            (v3) {
-                (PLAYER_SPEED * player->anglecos),
-                (PLAYER_SPEED * player->anglesin),
-                player->phys_obj.vel.z,
-            }
-        );
-    }
+    const float impulse = (
+        fabsf(vel->x) < MIN_PLAYER_SPEED &&
+        fabsf(vel->y) < MIN_PLAYER_SPEED &&
+        fabsf(vel->z) < MIN_PLAYER_SPEED
+    ) ? MIN_PLAYER_SPEED : REGULAR_IMPULSE;
 
-    if (player->back) {
-        P_SetVel(
-            &player->phys_obj,
-            (v3) {
-                -(PLAYER_SPEED * player->anglecos),
-                -(PLAYER_SPEED * player->anglesin),
-                player->phys_obj.vel.z,
-            }
-        );
-    }
+    const float anglecos = player->anglecos;
+    const float anglesin = player->anglesin;
 
-    if (player->left) {
-        P_AddVel(
-            &player->phys_obj,
-            (v3) {
-                -(PLAYER_SPEED * player->anglesin),
-                (PLAYER_SPEED * player->anglecos),
-                0.f
-            }
-        );
-    }
-
-    if (player->right) {
-        P_AddVel(
-            &player->phys_obj,
-            (v3) {
-                (PLAYER_SPEED * player->anglesin),
-                -(PLAYER_SPEED * player->anglecos),
-                0.f
-            }
-        );
-    }
-
-    player->phys_obj.vel.x = clamp(
-        player->phys_obj.vel.x,
-        -PLAYER_SPEED, PLAYER_SPEED
+    if (player->forward) P_AddVel(
+        phys_obj,
+        (v3) {
+            (impulse * anglecos),
+            (impulse * anglesin),
+            0.f
+        }
     );
 
-    player->phys_obj.vel.y = clamp(
-        player->phys_obj.vel.y,
-        -PLAYER_SPEED, PLAYER_SPEED
+    if (player->back) P_AddVel(
+        phys_obj,
+        (v3) {
+            -(impulse * anglecos),
+            -(impulse * anglesin),
+            0.f
+        }
     );
 
-    if (player->jump && player->phys_obj.pos.z == game_state.map.sectors.arr[player->sector].zfloor) {
-        P_AddVel(
-            &player->phys_obj,
-            (v3) {
-                player->phys_obj.vel.x * 0.1f,
-                player->phys_obj.vel.y * 0.1f,
-                JUMP_IMPULSE
-            }
-        );
-    }
+    if (player->left) P_AddVel(
+        phys_obj,
+        (v3) {
+            -(impulse * anglesin),
+             (impulse * anglecos),
+            0.f
+        }
+    );
+
+    if (player->right) P_AddVel(
+        phys_obj,
+        (v3) {
+             (impulse * anglesin),
+            -(impulse * anglecos),
+            0.f
+        }
+    );
+
+    if (player->jump && floored) P_AddVel(
+        phys_obj,
+        (v3) {
+            0.f, 0.f,
+            JUMP_IMPULSE
+        }
+    );
 }
 
 static inline float MATH_PointSide(v2 p, v2i a, v2i b) {
