@@ -25,7 +25,11 @@
 typedef int (*cmd_fn_t)(char*); // command fuction
 typedef struct {
     char name[32];  // variable name
-    char value[64]; // variable value
+
+    // variable values
+    char string[64]; // string value
+    int  integer;    // integer value
+    float floating;  // float value
 } cmd_var_t; // variable
 
 void CMD_Init(void); // init console

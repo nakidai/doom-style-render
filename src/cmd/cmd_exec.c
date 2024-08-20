@@ -67,17 +67,22 @@ int CMD_ExecuteText(const char* in) {
     }
 
     for (usize i = 0; i < cmd_var_len; i++) {
+        cmd_var_t* var = cmd_vars[i];
+
         // if name and variable name in index i equals
-        if (strcmp(cmd_vars[i]->name, name) == 0) {
+        if (strcmp(var->name, name) == 0) {
             const char* value = strtok(NULL, ""); // get all after name
 
             // if value is NULL, print variable value
             if (value == NULL) {
                 char buf[32];
-                snprintf(buf, sizeof(buf), "variable %s is %s\n", name, cmd_vars[i]->value);
+                snprintf(buf, sizeof(buf), "variable %s is %s\n", name, var->value);
                 CON_Printf(buf);
+            } else { // else parse value to variable fields
+                memcpy(var->string, value, strlen(value)); // parse string variable
+                sscanf(value, "%i", &var->integer);        // parse integer variable
+                sscanf(value, "%f", &var->floating);       // parse floating variable
             }
-            else memcpy(cmd_vars[i]->value, value, strlen(value)); // else copy value to variable value
 
             goto done;
         }
