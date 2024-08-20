@@ -23,7 +23,7 @@
 #ifndef _f_conf_h
 #define _f_conf_h
 
-#include "../../utils/u_def.h"
+#include "cl_def.h"
 
 #define MAX_ARRAY_SIZE 256 // max array size
 

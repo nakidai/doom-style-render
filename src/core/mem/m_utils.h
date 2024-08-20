@@ -12,6 +12,8 @@
 #ifndef _m_utils_h
 #define _m_utils_h
 
+#include "cl_def.h"
+
 #define KB(x) x * 1024     // convert kilobytes to bytes
 #define MB(x) KB(x) * 1024 // convert megabytes to bytes
 #define GB(x) MB(x) * 1024 // convert gigabytes to bytes

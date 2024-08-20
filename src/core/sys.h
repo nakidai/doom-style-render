@@ -1,11 +1,7 @@
 #ifndef _sys_h
 #define _sys_h
 
-#include "../utils/u_def.h"
-
-typedef struct {
-
-} pack_t;
+#include "cl_def.h"
 
 void SYS_Init(int argc, char* argv[]);
 

@@ -1,7 +1,7 @@
 #ifndef _v_vid_h
 #define _v_vid_h
 
-#include "../utils/u_def.h"
+#include "cl_def.h"
 
 #define INIT_WINDOW_W (int) (1280 / 1.5f)
 #define INIT_WINDOW_H (int) (720 / 1.5f)
