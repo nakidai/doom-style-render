@@ -22,5 +22,5 @@ include_directories(${SDL_TTF_INCLUDE_DIRS})
 include_directories(./src)
 
 add_subdirectory(src    ./src)
+add_subdirectory(editor ./editor)
 #add_subdirectory(tests  ./tests)
-#add_subdirectory(editor ./editor)
