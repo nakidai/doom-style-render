@@ -38,6 +38,7 @@ void CON_Draw(void) {
     char buf[64];
     snprintf(buf, sizeof(buf), "] %s", con_in);
 
+    // FIXME: fix leaks in draw
     CON_DrawString((v2i) { 10, 10 }, buf); // draw line
 }
 
