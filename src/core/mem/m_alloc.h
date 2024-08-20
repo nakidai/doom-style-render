@@ -12,8 +12,7 @@
 #ifndef _m_alloc_h
 #define _m_alloc_h
 
-#include "../../utils/u_def.h"
-#include "m_utils.h"
+#include "cl_def.h"
 
 #define TEMP_HEAP KB(256) // default temp heap size
 #define GLOB_HEAP MB(14)  // default glob heap size

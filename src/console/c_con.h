@@ -12,7 +12,9 @@
 #ifndef _c_con_h
 #define _c_con_h
 
-#include "utils/u_def.h"
+#include "cl_def.h"
+
+// TODO: write more comments
 
 void CON_Init(void);
 void CON_Free(void);

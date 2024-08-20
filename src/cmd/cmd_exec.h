@@ -12,7 +12,7 @@
 #ifndef _cmd_exec_h
 #define _cmd_exec_h
 
-#include "utils/u_def.h"
+#include "cl_def.h"
 
 #define SUCCESS           0   // success command exit code
 #define COMMAND_NOT_FOUND 1   // command not found

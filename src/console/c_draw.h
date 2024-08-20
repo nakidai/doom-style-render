@@ -12,7 +12,7 @@
 #ifndef _c_draw_h
 #define _c_draw_h
 
-#include "utils/u_def.h"
+#include "cl_def.h"
 
 #define CHAR_SIZE 16 // char size in char set
 
