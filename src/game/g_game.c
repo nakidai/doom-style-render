@@ -23,16 +23,21 @@ static int CMD_MinusRight(char* args __attribute__((unused))) { M_MOV(game_state
 static int CMD_PlusJump(char* args __attribute__((unused)))  { P_MOV(game_state.player.jump); }
 static int CMD_MinusJump(char* args __attribute__((unused))) { M_MOV(game_state.player.jump); }
 
-static float sens         = 0.005f;
-static float min_vert_ang = -1.0f;
-static float max_vert_ang =  1.0f;
+static cmd_var_t sens         = { "cl_sens", "", 0, 0.005f };
+static cmd_var_t min_vert_ang = { "cl_min_vert_ang", "", 0, -1.0f };
+static cmd_var_t max_vert_ang = { "cl_max_vert_ang", "", 0,  1.0f };
 
-static int CMD_SetSens(char* args)       { READ_FLOAT_VAR(sens); }
-static int CMD_SetMinVertAng(char* args) { READ_FLOAT_VAR(min_vert_ang); }
-static int CMD_SetMaxVertAng(char* args) { READ_FLOAT_VAR(max_vert_ang); }
+static cmd_var_t tick_rate = { "sv_tick_rate", "", TICK_RATE, 0.f };
 
-static int CMD_SetSlowdown(char* args) { READ_FLOAT_VAR(game_state.slowdown); }
-static int CMD_SetGravity(char* args)  { READ_FLOAT_VAR(game_state.gravity); }
+extern cmd_var_t gravity;
+extern cmd_var_t axel;
+extern cmd_var_t air_axel;
+
+extern cmd_var_t min_player_speed;
+extern cmd_var_t regular_impulse;
+extern cmd_var_t floor_jump_box_size;
+extern cmd_var_t jump_impulse;
+extern cmd_var_t player_eye;
 
 static int CMD_TeleportPlayer(char* args) {
     v3* pos = &game_state.player.phys_obj.pos;
@@ -65,19 +70,25 @@ void G_Init(void) {
     CMD_AddCommand("+jump",    &CMD_PlusJump);
     CMD_AddCommand("-jump",    &CMD_MinusJump);
 
-    CMD_AddCommand("cl_sens",         &CMD_SetSens);
-    CMD_AddCommand("cl_min_vert_ang", &CMD_SetMinVertAng);
-    CMD_AddCommand("cl_max_vert_ang", &CMD_SetMaxVertAng);
-
     CMD_AddCommand("pl_tp", &CMD_TeleportPlayer);
-
-    CMD_AddCommand("ps_gravity",  &CMD_SetGravity);
-    CMD_AddCommand("ps_slowdown", &CMD_SetSlowdown);
 
     CMD_AddCommand("map", &CMD_LoadMap);
 
-    game_state.slowdown = SLOWDOWN;
-    game_state.gravity  = GRAVITY;
+    CMD_AddVariable(&sens);
+    CMD_AddVariable(&min_vert_ang);
+    CMD_AddVariable(&max_vert_ang);
+
+    CMD_AddVariable(&tick_rate);
+
+    CMD_AddVariable(&gravity);
+    CMD_AddVariable(&axel);
+    CMD_AddVariable(&air_axel);
+
+    CMD_AddVariable(&min_player_speed);
+    CMD_AddVariable(&regular_impulse);
+    CMD_AddVariable(&floor_jump_box_size);
+    CMD_AddVariable(&jump_impulse);
+    CMD_AddVariable(&player_eye);
 
     G_InitPlayer(&game_state.player);
 }
@@ -91,9 +102,9 @@ static void G_HandleMouse(void) {
 
     player_t* player = &game_state.player;
 
-    player->angle      += sens * (width / 2 - x);
-    player->vert_angle -= sens * (height / 2 - y);
-    player->vert_angle = clamp(player->vert_angle, min_vert_ang, max_vert_ang);
+    player->angle      += sens.floating * (width / 2 - x);
+    player->vert_angle -= sens.floating * (height / 2 - y);
+    player->vert_angle = clamp(player->vert_angle, min_vert_ang.floating, max_vert_ang.floating);
 
     SDL_WarpMouseInWindow(video_state.window, width / 2, height / 2);
 }
@@ -110,7 +121,7 @@ void G_Update(void) {
     player->anglesin = sin(player->angle);
 
     G_HandleMouse();
-    if ((SDL_GetTicks() % (100 / TICK_RATE)) == 0) G_Tick();
+    if ((SDL_GetTicks() % (100 / tick_rate.integer)) == 0) G_Tick();
 }
 
 void G_Render(void) {

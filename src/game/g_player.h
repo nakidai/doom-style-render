@@ -5,7 +5,11 @@
 #include "../utils/math/u_math.h"
 #include "g_phys.h"
 
-#define PLAYER_EYE_Z 1.1f
+#define PLAYER_EYE_Z        1.1f
+#define MIN_PLAYER_SPEED    0.1f
+#define REGULAR_IMPULSE     0.004f
+#define FLOOR_JUMP_BOX_SIZE 0.05f
+#define JUMP_IMPULSE        0.2f
 
 typedef struct {
     int sector;
