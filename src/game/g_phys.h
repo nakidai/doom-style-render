@@ -5,12 +5,13 @@
 #include "utils/math/u_math.h"
 
 #define SLOWDOWN 1.1f
-#define GRAVITY  -0.03f
+#define GRAVITY  -0.02f
 
 typedef struct {
     v3 vel;
     v3 pos;
     float mass;
+    bool floored; // TODO: move calculation this variable to P_UpdateObject 
 } phys_obj_t;
 
 void P_AddVel(phys_obj_t* obj, v3 vel);
