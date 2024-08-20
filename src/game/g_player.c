@@ -4,10 +4,11 @@ extern state_t      client_state;
 extern vidstate_t   video_state;
 extern game_state_t game_state;
 
-#define MIN_PLAYER_SPEED    0.1f
-#define REGULAR_IMPULSE     0.004f
-#define FLOOR_JUMP_BOX_SIZE 0.05f
-#define JUMP_IMPULSE        0.2f
+cmd_var_t min_player_speed    = { "sv_min_player_speed",    "", 0, MIN_PLAYER_SPEED };
+cmd_var_t regular_impulse     = { "sv_regular_impulse",     "", 0, REGULAR_IMPULSE };
+cmd_var_t floor_jump_box_size = { "sv_floor_jump_box_size", "", 0, FLOOR_JUMP_BOX_SIZE };
+cmd_var_t jump_impulse        = { "sv_jump_impulse",        "", 0, JUMP_IMPULSE };
+cmd_var_t player_eye          = { "sv_player_eye",          "", 0, PLAYER_EYE_Z };
 
 static void G_MovePlayer(player_t* player) {
     const sector_t* player_sector = &game_state.map.sectors.arr[player->sector];
@@ -17,7 +18,7 @@ static void G_MovePlayer(player_t* player) {
 
     phys_obj_t* phys_obj = &player->phys_obj;
 
-    const bool floored = pos->z <= player_sector->zfloor + FLOOR_JUMP_BOX_SIZE;
+    const bool floored = pos->z <= player_sector->zfloor + floor_jump_box_size.floating;
     phys_obj->floored = floored;
 
     P_UpdateObject(phys_obj);
@@ -27,16 +28,16 @@ static void G_MovePlayer(player_t* player) {
         pos->z = player_sector->zfloor;
     }
 
-    if (pos->z + PLAYER_EYE_Z > player_sector->zceil) {
+    if (pos->z + player_eye.floating > player_sector->zceil) {
         vel->z = 0;
-        pos->z = player_sector->zceil - PLAYER_EYE_Z;
+        pos->z = player_sector->zceil - player_eye.floating;
     }
 
     const float impulse = (
-        fabsf(vel->x) < MIN_PLAYER_SPEED &&
-        fabsf(vel->y) < MIN_PLAYER_SPEED &&
-        fabsf(vel->z) < MIN_PLAYER_SPEED
-    ) ? MIN_PLAYER_SPEED : REGULAR_IMPULSE;
+        fabsf(vel->x) < min_player_speed.floating &&
+        fabsf(vel->y) < min_player_speed.floating &&
+        fabsf(vel->z) < min_player_speed.floating
+    ) ? min_player_speed.floating : regular_impulse.floating;
 
     const float anglecos = player->anglecos;
     const float anglesin = player->anglesin;
@@ -81,7 +82,7 @@ static void G_MovePlayer(player_t* player) {
         phys_obj,
         (v3) {
             0.f, 0.f,
-            JUMP_IMPULSE
+            jump_impulse.floating
         }
     );
 }
@@ -157,5 +158,5 @@ void G_UpdatePlayer(player_t* player) {
     G_MovePlayer(player);
     G_UpdatePlayerSector(player);
 
-    player->eye_z = player->phys_obj.pos.z + PLAYER_EYE_Z;
+    player->eye_z = player->phys_obj.pos.z + player_eye.floating;
 }

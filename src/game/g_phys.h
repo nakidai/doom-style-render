@@ -4,8 +4,9 @@
 #include "utils/u_def.h"
 #include "utils/math/u_math.h"
 
-#define SLOWDOWN 1.1f
 #define GRAVITY  -0.02f
+#define AXEL     0.1f
+#define AIR_AXEL 0.01f
 
 typedef struct {
     v3 vel;

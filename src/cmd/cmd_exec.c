@@ -47,6 +47,7 @@ void CMD_AddVariable(cmd_var_t* var) {
 }
 
 // execute text
+// TODO: optimize linear search (add hash maps)
 int CMD_ExecuteText(const char* in) {
     if (*in == '#' || in == NULL || *in == '\0') return COMMENT; // if comment or null string, return
 
@@ -76,7 +77,7 @@ int CMD_ExecuteText(const char* in) {
             // if value is NULL, print variable value
             if (value == NULL) {
                 char buf[32];
-                snprintf(buf, sizeof(buf), "variable %s is %s\n", name, var->value);
+                snprintf(buf, sizeof(buf), "variable %s is %s\n", name, var->string);
                 CON_Printf(buf);
             } else { // else parse value to variable fields
                 memcpy(var->string, value, strlen(value)); // parse string variable

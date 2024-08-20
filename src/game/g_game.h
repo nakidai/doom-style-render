@@ -10,8 +10,6 @@
 typedef struct {
     player_t player;
     map_t    map;
-
-    float gravity, slowdown;
 } game_state_t;
 
 void G_Init(void);
