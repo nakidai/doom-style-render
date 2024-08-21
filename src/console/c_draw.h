@@ -14,7 +14,8 @@
 
 #include "cl_def.h"
 
-#define CHAR_SIZE 16 // char size in char set
+#define CHAR_SIZE      16 // char size in char set
+#define MAX_LINE_CHARS 22 // max chars in drawing line
 
 void CON_DrawInit(void); // load char set
 void CON_DrawFree(void); // free char set texture

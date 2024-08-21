@@ -15,12 +15,19 @@ char con_buf[1024];     // console output buffer
 static char con_in[32]; // console input buffer
 
 extern vidstate_t   video_state;  // link video state
-extern game_state_t game_state;   // link game state
+
+cmd_var_t console_black_out =    { "con_blackout",     "", 32, 0.f };
+cmd_var_t console_input_prefix = { "con_input_prefix", "] ", 0, 0.f };
 
 // init console
 void CON_Init(void) {
     CON_DrawInit(); // init char drawing (load charset)
+
+    CMD_AddVariable(&console_black_out);
+    CMD_AddVariable(&console_input_prefix);
+
     CON_Printf("console init done!\n"); // print done to console
+    CON_Printf(console_input_prefix.string);
 }
 
 // free console
@@ -30,25 +37,31 @@ void CON_Free(void) {
 
 // draw console
 void CON_Draw(void) {
-    GFX_Blackout(128, (v2i) { 0, 0 }, (v2i) { SCREEN_WIDTH, SCREEN_HEIGHT }); // black screen buffer
-
+    GFX_Blackout(console_black_out.integer, (v2i) { 0, 0 }, (v2i) { SCREEN_WIDTH, SCREEN_HEIGHT }); // black screen buffer
     CON_DrawString((v2i) { 5, SCREEN_HEIGHT - 10 }, con_buf); // draw console buffer
-
-    // add "]" to start con_in buffer
-    char buf[64];
-    snprintf(buf, sizeof(buf), "] %s", con_in);
-
-    // FIXME: fix leaks in draw
-    CON_DrawString((v2i) { 10, 10 }, buf); // draw line
 }
 
 // print to console
 void CON_Printf(const char* msg) {
     strcat(con_buf, msg); // add message to back
+
+    usize lines = 0;
+    for (usize i = 0; i < strlen(con_buf); i++) {
+        if (con_buf[i] == '\n') lines++;
+    }
+
+    if (lines >= MAX_LINES) {
+        strtok(con_buf, "\n");
+        const char* new_buf = strtok(NULL, "");
+        memcpy(con_buf, new_buf, strlen(new_buf));
+        con_buf[strlen(new_buf)] = '\0';
+    }
 }
 
 // process input
 static void CON_ProcessInput(const char* text) {
+    CON_Printf(text);
+
     if (strlen(con_in) >= sizeof(con_in)) return; // if input buffer string size > max length of input buffer, return
     strcat(con_in, text);                         // add new text to input buffer
 }
@@ -58,12 +71,13 @@ static void CON_Exec(void) {
     if (strlen(con_in) == 0) return; // if command buffer is NULL, return
 
     // execute command
-    char out_buf[32];
-    snprintf(out_buf, sizeof(out_buf), "Command exited with code %i\n", CMD_ExecuteText(con_in));
-    CON_Printf(out_buf);
+    CMD_ExecuteText(con_in);
 
     // free console input buffer
     memset(con_in, '\0', sizeof(con_in));
+
+    CON_Printf("\n");
+    CON_Printf(console_input_prefix.string);
 }
 
 extern usize     event_count; // app event count

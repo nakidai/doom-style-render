@@ -16,6 +16,8 @@
 
 // TODO: write more comments
 
+#define MAX_LINES 12
+
 void CON_Init(void);
 void CON_Free(void);
 void CON_Draw(void);
