@@ -5,6 +5,7 @@
 #include "utils/r_texture.h"
 #include "game/g_player.h"
 #include "game/g_map.h"
+#include "r_camera.h"
 
 #define EYE_Z 1.0f
 #define HFOV DEG2RAD(120.0f)
@@ -19,7 +20,7 @@ typedef struct {
 } render_state_t;
 
 void R_Init(void);
-void R_RenderPlayerView(player_t* player, map_t* map);
+void R_RenderCameraView(camera_t* camera, map_t* map);
 void R_Free(void);
 
 #endif

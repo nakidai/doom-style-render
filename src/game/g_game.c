@@ -38,9 +38,10 @@ extern cmd_var_t regular_impulse;
 extern cmd_var_t floor_jump_box_size;
 extern cmd_var_t jump_impulse;
 extern cmd_var_t player_eye;
+extern cmd_var_t player_height;
 
 static int CMD_TeleportPlayer(char* args) {
-    v3* pos = &game_state.player.phys_obj.pos;
+    v3* pos = &game_state.player.phys_obj.obj.pos;
 
     if (sscanf(
         args,
@@ -89,6 +90,7 @@ void G_Init(void) {
     CMD_AddVariable(&floor_jump_box_size);
     CMD_AddVariable(&jump_impulse);
     CMD_AddVariable(&player_eye);
+    CMD_AddVariable(&player_height);
 
     G_InitPlayer(&game_state.player);
 }
@@ -102,9 +104,10 @@ static void G_HandleMouse(void) {
 
     player_t* player = &game_state.player;
 
-    player->angle      += sens.floating * (width / 2 - x);
-    player->vert_angle -= sens.floating * (height / 2 - y);
-    player->vert_angle = clamp(player->vert_angle, min_vert_ang.floating, max_vert_ang.floating);
+    player->camera.angle.x += sens.floating * (width / 2 - x);
+    player->camera.angle.y -= sens.floating * (height / 2 - y);
+
+    player->camera.angle.y = clamp(player->camera.angle.y, min_vert_ang.floating, max_vert_ang.floating);
 
     SDL_WarpMouseInWindow(video_state.window, width / 2, height / 2);
 }
@@ -114,18 +117,12 @@ static void G_Tick(void) {
 }
 
 void G_Update(void) {
-    // TODO: move player angle calculation to player class
-    player_t* player = &game_state.player;
-
-    player->anglecos = cos(player->angle);
-    player->anglesin = sin(player->angle);
-
     G_HandleMouse();
     if ((SDL_GetTicks() % (100 / tick_rate.integer)) == 0) G_Tick();
 }
 
 void G_Render(void) {
-    R_RenderPlayerView(&game_state.player, &game_state.map); // render player view
+    R_RenderCameraView(&game_state.player.camera, &game_state.map); // render player view
 }
 
 void G_Free(void) {

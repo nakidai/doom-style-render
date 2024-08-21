@@ -25,6 +25,7 @@ target_sources(cl_main PRIVATE
     ./core/keys/k_manager.c
     ./game/g_game.c
     ./render/draw/r_draw.c
+    ./game/g_world_object.c
 )
 
 if(WIN32)
