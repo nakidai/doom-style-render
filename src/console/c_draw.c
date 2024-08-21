@@ -22,7 +22,6 @@ void CON_DrawFree(void) {
 }
 
 extern vidstate_t video_state; // link video state
-extern char con_buf[1024];     // link console buffer
 
 // char drawing
 void CON_DrawChar(v2i pos, const char c) {
@@ -48,10 +47,9 @@ void CON_DrawString(v2i pos, const char* text) {
 
     for (usize i = 0; i < strlen(text); i++) {
         loop_pos.x += CHAR_SIZE;
-
         if (text[i] == '\n') { line++; loop_pos.x = pos.x; loop_pos.y -= CHAR_SIZE; }
-        if (loop_pos.x >= SCREEN_WIDTH) { line++; loop_pos.x = pos.x; loop_pos.y -= CHAR_SIZE; }
-        if (loop_pos.y <= 0) { loop_pos = pos; memset(con_buf, '\0', sizeof(con_buf)); }
+
+        if (loop_pos.x / CHAR_SIZE >= MAX_LINE_CHARS) continue;
 
         CON_DrawChar(loop_pos, text[i]);
     }
