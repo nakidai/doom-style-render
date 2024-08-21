@@ -49,9 +49,9 @@ void CMD_AddVariable(cmd_var_t* var) {
 // execute text
 // TODO: optimize linear search (add hash maps)
 int CMD_ExecuteText(const char* in) {
-    if (*in == '#' || in == NULL || *in == '\0') return COMMENT; // if comment or null string, return
+    if (*in == '#' || in == NULL || *in == '\0') return CE_COMMENT; // if comment or null string, return
 
-    int ret = VARIABLE; // set return status to variable
+    int ret = CE_VARIABLE; // set return status to variable
 
     char text[64] = {'\0'};       // create buffer for strtok
     memcpy(text, in, strlen(in)); // copy in variable to buffer
@@ -77,7 +77,7 @@ int CMD_ExecuteText(const char* in) {
             // if value is NULL, print variable value
             if (value == NULL) {
                 char buf[32];
-                snprintf(buf, sizeof(buf), "variable %s is %s\n", name, var->string);
+                snprintf(buf, sizeof(buf), "\n%s is %s", name, var->string);
                 CON_Printf(buf);
             } else { // else parse value to variable fields
                 memcpy(var->string, value, strlen(value)); // parse string variable
@@ -89,7 +89,7 @@ int CMD_ExecuteText(const char* in) {
         }
     }
 
-    ret = COMMAND_NOT_FOUND; // if command or variable with name not found, set ret to command not found value 
+    ret = CE_NOT_FOUND; // if command or variable with name not found, set ret to command not found value 
 
     done:
         return ret; // return result
@@ -102,7 +102,7 @@ int CMD_Echo(char* args) {
     snprintf(buf, sizeof(buf), "%s\n", args);
 
     CON_Printf(buf); // print variable
-    return SUCCESS;
+    return CE_SUCCESS;
 }
 
 // exec command
@@ -113,7 +113,7 @@ int CMD_ExecCommand(char* args) {
     M_TempFree(game_dir);
 
     FILE* file = fopen(path, "r"); // open file in arguments
-    if (file == NULL) return 2;    // if file not found, return
+    if (file == NULL) return CE_COMMAND_ERROR;    // if file not found, return
 
     // execute all lines from file
     char line[64];
@@ -124,5 +124,5 @@ int CMD_ExecCommand(char* args) {
 
     fclose(file); // close file
     
-    return SUCCESS;
+    return CE_SUCCESS;
 }

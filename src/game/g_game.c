@@ -4,7 +4,7 @@ game_state_t      game_state;
 extern state_t    client_state;
 extern vidstate_t video_state;
 
-#define MOVE_CMD(x, y) ({ x = y; return SUCCESS; })
+#define MOVE_CMD(x, y) ({ x = y; return CE_SUCCESS; })
 #define P_MOV(x) MOVE_CMD(x, true)
 #define M_MOV(x) MOVE_CMD(x, false)
 
@@ -51,12 +51,12 @@ static int CMD_TeleportPlayer(char* args) {
         &pos->z
     ) != 3) return 2;
 
-    return SUCCESS;
+    return CE_SUCCESS;
 }
 
 static int CMD_LoadMap(char* args) {
     G_LoadMap(&game_state.map, args);
-    return SUCCESS;
+    return CE_SUCCESS;
 }
 
 void G_Init(void) {

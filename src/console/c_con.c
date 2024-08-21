@@ -11,8 +11,8 @@
 
 #include "cl_def.h"
 
-char con_buf[1024];     // console output buffer
-static char con_in[32]; // console input buffer
+static char con_buf[1024]; // console output buffer
+static char con_in[32];    // console input buffer
 
 extern vidstate_t   video_state;  // link video state
 
@@ -71,7 +71,22 @@ static void CON_Exec(void) {
     if (strlen(con_in) == 0) return; // if command buffer is NULL, return
 
     // execute command
-    CMD_ExecuteText(con_in);
+    int ret = CMD_ExecuteText(con_in);
+    switch (ret) {
+        case CE_NOT_FOUND:
+            CON_Printf("\nCommand not found!");
+            break;
+
+        case CE_COMMAND_ERROR:
+            CON_Printf("\nCommand error!");
+            break;
+
+        case CE_SUCCESS:
+        case CE_VARIABLE:
+        case CE_COMMENT:
+        default:
+            break;
+    }
 
     // free console input buffer
     memset(con_in, '\0', sizeof(con_in));
