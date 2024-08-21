@@ -13,7 +13,7 @@ void R_Free(void) {
     T_FreeTexture(&render_state.textures[0]);
 }
 
-void R_RenderPlayerView(player_t* player, map_t* map) {
+void R_RenderCameraView(camera_t* camera, map_t* map) {
     for (int i = 0; i < SCREEN_WIDTH; i++) {
         render_state.y_hi[i] = SCREEN_HEIGHT - 1;
         render_state.y_lo[i] = 0;
@@ -36,7 +36,7 @@ void R_RenderPlayerView(player_t* player, map_t* map) {
     struct queue_entry { int id, x0, x1; };
 
     struct { struct queue_entry arr[QUEUE_MAX]; usize n; } queue = {
-        {{ player->sector, 0, SCREEN_WIDTH - 1 }},
+        {{ camera->obj.sector, 0, SCREEN_WIDTH - 1 }},
         1
     };
 
@@ -61,10 +61,13 @@ void R_RenderPlayerView(player_t* player, map_t* map) {
                 &map->walls.arr[sector->firstwall + i];
 
             // translate relative to player and rotate points around player's view
-            const v2 cam_pos = (v2) { player->phys_obj.pos.x, player->phys_obj.pos.y };
+            const v2 cam_pos = (v2) { camera->obj.pos.x, camera->obj.pos.y };
+            const float anglesin = sin(camera->angle.x);
+            const float anglecos = cos(camera->angle.x);
+
             const v2
-                op0 = MATH_WorldPosToCamera(v2i_to_v2(wall->a), cam_pos, player->anglesin, player->anglecos),
-                op1 = MATH_WorldPosToCamera(v2i_to_v2(wall->b), cam_pos, player->anglesin, player->anglecos);
+                op0 = MATH_WorldPosToCamera(v2i_to_v2(wall->a), cam_pos, anglesin, anglecos),
+                op1 = MATH_WorldPosToCamera(v2i_to_v2(wall->b), cam_pos, anglesin, anglecos);
 
             // wall clipped pos
             v2 cp0 = op0, cp1 = op1;
@@ -140,8 +143,8 @@ void R_RenderPlayerView(player_t* player, map_t* map) {
                 sy0 = ifnan((VFOV * SCREEN_HEIGHT) / cp0.y, 1e10),
                 sy1 = ifnan((VFOV * SCREEN_HEIGHT) / cp1.y, 1e10);
 
-            const f32 eye_z = player->eye_z;
-            const f32 vert_angl = player->vert_angle * SCREEN_HEIGHT;
+            const f32 eye_z = camera->obj.pos.z;
+            const f32 vert_angl = camera->angle.y * SCREEN_HEIGHT;
 
             const f32 wall_f0 = wall->f0;
             const f32 wall_f1 = wall->f1;

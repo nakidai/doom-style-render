@@ -22,6 +22,7 @@
 #include "game/g_player.h"             // player class
 #include "game/g_map.h"                // map class
 #include "game/g_phys.h"               // physics object class
+#include "game/g_world_object.h"       // world object class
 #include "game/gfx/gfx_post_process.h" // post processing metods
 
 // render headers
