@@ -21,20 +21,20 @@ SDL_Event events[128];     // app event list
 // only for client
 int CMD_ExitCommand(char* args __attribute__((unused))) {
     client_state.quit = true;
-    return SUCCESS;
+    return CE_SUCCESS;
 }
 
 // debug interrupt call
 int CMD_DebugBreak(char* args __attribute__((unused))) {
     __asm__ __volatile__("int {$}3":);
-    return SUCCESS;
+    return CE_SUCCESS;
 }
 
 // command for toggle console
 int CMD_ToggleConsole(char* args __attribute__((unused))) {
     // if console opened, close, else closed open
     client_state.console = !client_state.console;
-    return SUCCESS;
+    return CE_SUCCESS;
 }
 
 // client initialization
@@ -53,8 +53,8 @@ static void CL_Init(int argc, char** argv) {
     CMD_Init(); // init command executor
     CON_Init(); // init console
 
-    CMD_AddCommand("exit",        &CMD_ExitCommand);      // add command for exit
-    CMD_AddCommand("debug_break", &CMD_DebugBreak);       // add command for debug break
+    CMD_AddCommand("exit",           &CMD_ExitCommand);   // add command for exit
+    CMD_AddCommand("debug_break",    &CMD_DebugBreak);    // add command for debug break
     CMD_AddCommand("toggle_console", &CMD_ToggleConsole); // add toggle console command
 
     V_Init();   // init video

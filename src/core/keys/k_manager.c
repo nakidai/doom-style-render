@@ -70,7 +70,7 @@ static int CMD_BindCommand(char* args) {
     
     binds[binds_len++] = bind; // push bind at last
 
-    return SUCCESS;
+    return CE_SUCCESS;
 }
 
 // init key manager

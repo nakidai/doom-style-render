@@ -14,15 +14,18 @@
 
 #include "cl_def.h"
 
-#define SUCCESS           0   // success command exit code
-#define COMMAND_NOT_FOUND 1   // command not found
-#define VARIABLE          255 // variable exit code
-#define COMMENT           256 // comment exit code
+typedef enum {
+    CE_SUCCESS,
+    CE_COMMAND_ERROR = 2,
+    CE_NOT_FOUND,
+    CE_VARIABLE,
+    CE_COMMENT
+} command_exit_t;
 
-#define READ_FLOAT_VAR(x) ({ if (sscanf(args, "%f", &x) != 1) return 2; return SUCCESS; }) // macro from read float variable
-#define READ_INT_VAR(x)   ({ if (sscanf(args, "%i", &x) != 1) return 2; return SUCCESS; }) // macro from read int variable
+#define READ_FLOAT_VAR(x) ({ if (sscanf(args, "%f", &x) != 1) return 2; return CE_SUCCESS; }) // macro from read float variable
+#define READ_INT_VAR(x)   ({ if (sscanf(args, "%i", &x) != 1) return 2; return CE_SUCCESS; }) // macro from read int variable
 
-typedef int (*cmd_fn_t)(char*); // command fuction
+typedef command_exit_t (*cmd_fn_t)(char*); // command fuction
 typedef struct {
     char name[32];  // variable name
 
