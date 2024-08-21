@@ -20,8 +20,8 @@ void R_RenderCameraView(camera_t* camera, map_t* map) {
     }
 
     // track if sector has already been drawn
-    u8 sectdraw[SECTOR_MAX];
-    memset(sectdraw, 0, sizeof(sectdraw));
+    bool portdraw[256];
+    memset(portdraw, 0, sizeof(portdraw));
 
     // calculate edges of near/far planes (looking down +Y axis)
     const v2
@@ -47,18 +47,14 @@ void R_RenderCameraView(camera_t* camera, map_t* map) {
         // grab tail of queue
         struct queue_entry entry = queue.arr[--queue.n];
 
-        // FIXME: fix algorism for recursive portals
-        if (sectdraw[entry.id] >= 6) {
-            continue;
-        }
-
-        sectdraw[entry.id]++;
-
         const sector_t* sector = &map->sectors.arr[entry.id];
 
         for (usize i = 0; i < sector->nwalls; i++) {
             const wall_t* wall =
                 &map->walls.arr[sector->firstwall + i];
+
+            if (portdraw[sector->firstwall + i]) continue;
+            portdraw[sector->firstwall + i] = true;
 
             // translate relative to player and rotate points around player's view
             const v2 cam_pos = (v2) { camera->obj.pos.x, camera->obj.pos.y };
@@ -234,6 +230,7 @@ void R_RenderCameraView(camera_t* camera, map_t* map) {
 
             if (wall->portal) {
                 ASSERT(queue.n != QUEUE_MAX, "R_Render: out of queue space");
+
                 queue.arr[queue.n++] = (struct queue_entry){
                     .id = wall->portal,
                     .x0 = x0,
