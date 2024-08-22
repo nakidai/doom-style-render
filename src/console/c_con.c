@@ -11,14 +11,16 @@
 
 #include "cl_def.h"
 
-static char con_buf[1024]; // console output buffer
-static char con_in[32];    // console input buffer
+static char  con_buf[1024]; // console output buffer
+static char  con_in[32];    // console input buffer
+static FILE* con_log;       // logging file
 
 extern vidstate_t   video_state;  // link video state
 
-static cmd_var_t console_black_out =    { "con_blackout",     "", 32, 0.f };
-static cmd_var_t console_input_prefix = { "con_input_prefix", "] ", 0, 0.f };
-static cmd_var_t console_print_errors = { "con_print_errors", "0", 0, 0.f };
+static cmd_var_t console_black_out     = { "con_blackout",      "",   32, 0.f };
+static cmd_var_t console_input_prefix  = { "con_input_prefix",  "] ", 0,  0.f };
+static cmd_var_t console_print_errors  = { "con_print_errors",  "0",  0,  0.f };
+static cmd_var_t console_store_history = { "con_save_logs",     "1",  0,  0.f }; 
 
 // init console
 void CON_Init(void) {
@@ -27,14 +29,16 @@ void CON_Init(void) {
     CMD_AddVariable(&console_black_out);
     CMD_AddVariable(&console_input_prefix);
     CMD_AddVariable(&console_print_errors);
+    CMD_AddVariable(&console_store_history);
 
-    CON_Printf("console init done!\n"); // print done to console
     CON_Printf(console_input_prefix.string);
 }
 
 // free console
 void CON_Free(void) {
     CON_DrawFree(); // free charset
+
+    if (con_log != NULL) fclose(con_log);
 }
 
 // draw console
@@ -47,6 +51,7 @@ void CON_Draw(void) {
 void CON_Printf(const char* msg) {
     strcat(con_buf, msg); // add message to back
 
+    // scrolling
     usize lines = 0;
     for (usize i = 0; i < strlen(con_buf); i++) {
         if (con_buf[i] == '\n') lines++;
@@ -57,6 +62,19 @@ void CON_Printf(const char* msg) {
         const char* new_buf = strtok(NULL, "");
         memcpy(con_buf, new_buf, strlen(new_buf));
         con_buf[strlen(new_buf)] = '\0';
+    }
+
+    // saving console history
+    if (*console_store_history.string != '0') {
+        if (con_log == NULL) {
+            char path[64];
+            sprintf(path, "%scon.log", SYS_GetGameDir());
+
+            con_log = fopen(path, "w");
+            if (con_log == NULL) ERROR("CON_Printf: can't open console history file");
+        }
+
+        fprintf(con_log, msg);
     }
 }
 
