@@ -2,7 +2,19 @@
 
 render_state_t render_state;
 
+cmd_var_t z_far     = { "r_zfar",  "", 0, ZFAR };
+cmd_var_t z_near    = { "r_znear", "", 0, ZNEAR };
+cmd_var_t h_fov     = { "r_hfov",  "", 0, HFOV };
+cmd_var_t v_fov     = { "r_vfov",  "", 0, VFOV };
+cmd_var_t fulbright = { "r_fulbright", "0", 0, 0.f };
+
 void R_Init(void) {
+    CMD_AddVariable(&z_far);
+    CMD_AddVariable(&z_near);
+    CMD_AddVariable(&h_fov);
+    CMD_AddVariable(&v_fov);
+    CMD_AddVariable(&fulbright);
+    
     texture_t* tex = &render_state.textures[0];
     tex->size = (v2i) { 32, 32 };
     T_AllocTexture(tex);
@@ -19,18 +31,16 @@ void R_RenderCameraView(camera_t* camera, map_t* map) {
         render_state.y_lo[i] = 0;
     }
 
-    // track if sector has already been drawn
     u8 portdraw[256];
     memset(portdraw, 0, sizeof(portdraw));
 
-    // calculate edges of near/far planes (looking down +Y axis)
     const v2
-        zdl = MATH_Rotate(((v2) { 0.0f, 1.0f }), +(HFOV / 2.0f)),
-        zdr = MATH_Rotate(((v2) { 0.0f, 1.0f }), -(HFOV / 2.0f)),
-        znl = (v2){ zdl.x * ZNEAR, zdl.y * ZNEAR },
-        znr = (v2){ zdr.x * ZNEAR, zdr.y * ZNEAR },
-        zfl = (v2){ zdl.x * ZFAR, zdl.y * ZFAR },
-        zfr = (v2){ zdr.x * ZFAR, zdr.y * ZFAR };
+        zdl = MATH_Rotate(((v2) { 0.0f, 1.0f }), +(h_fov.floating / 2.0f)),
+        zdr = MATH_Rotate(((v2) { 0.0f, 1.0f }), -(h_fov.floating / 2.0f)),
+        znl = (v2){ zdl.x * z_near.floating, zdl.y * z_near.floating },
+        znr = (v2){ zdr.x * z_near.floating, zdr.y * z_near.floating },
+        zfl = (v2){ zdl.x * z_far.floating, zdl.y * z_far.floating },
+        zfr = (v2){ zdr.x * z_far.floating, zdr.y * z_far.floating };
 
     enum { QUEUE_MAX = 64 };
     struct queue_entry { int id, x0, x1; };
@@ -80,10 +90,10 @@ void R_RenderCameraView(camera_t* camera, map_t* map) {
 
             // clip against view frustum if both angles are not clearly within
             // HFOV
-            if (cp0.y < ZNEAR
-                || cp1.y < ZNEAR
-                || ap0 > +(HFOV / 2)
-                || ap1 < -(HFOV / 2)) {
+            if (cp0.y < z_near.floating
+                || cp1.y < z_near.floating
+                || ap0 > +(h_fov.floating / 2)
+                || ap1 < -(h_fov.floating / 2)) {
                 const v2
                     il = MATH_IntersectSegs(cp0, cp1, znl, zfl),
                     ir = MATH_IntersectSegs(cp0, cp1, znr, zfr);
@@ -104,8 +114,8 @@ void R_RenderCameraView(camera_t* camera, map_t* map) {
                 continue;
             }
 
-            if ((ap0 < -(HFOV / 2) && ap1 < -(HFOV / 2))
-                || (ap0 > +(HFOV / 2) && ap1 > +(HFOV / 2))) {
+            if ((ap0 < -(h_fov.floating / 2) && ap1 < -(h_fov.floating / 2))
+                || (ap0 > +(h_fov.floating / 2) && ap1 > +(h_fov.floating / 2))) {
                 continue;
             }
 
@@ -128,16 +138,14 @@ void R_RenderCameraView(camera_t* camera, map_t* map) {
                 x1 = clamp(tx1, entry.x0, entry.x1);
 
             const f32
-                z_floor = sector->zfloor,
-                z_ceil = sector->zceil,
-                nz_floor =
-                wall->portal ? map->sectors.arr[wall->portal].zfloor : 0,
-                nz_ceil =
-                wall->portal ? map->sectors.arr[wall->portal].zceil : 0;
+                z_floor  = sector->zfloor,
+                z_ceil   = sector->zceil,
+                nz_floor = wall->portal ? map->sectors.arr[wall->portal].zfloor : 0,
+                nz_ceil  = wall->portal ? map->sectors.arr[wall->portal].zceil : 0;
 
             const f32
-                sy0 = ifnan((VFOV * SCREEN_HEIGHT) / cp0.y, 1e10),
-                sy1 = ifnan((VFOV * SCREEN_HEIGHT) / cp1.y, 1e10);
+                sy0 = ifnan((v_fov.floating * SCREEN_HEIGHT) / cp0.y, 1e10),
+                sy1 = ifnan((v_fov.floating * SCREEN_HEIGHT) / cp1.y, 1e10);
 
             const f32 eye_z = camera->obj.pos.z;
             const f32 vert_angl = camera->angle.y * SCREEN_HEIGHT;
@@ -177,7 +185,7 @@ void R_RenderCameraView(camera_t* camera, map_t* map) {
                     yf = clamp(tyf + vert_angl, render_state.y_lo[x], render_state.y_hi[x]),
                     yc = clamp(tyc + vert_angl, render_state.y_lo[x], render_state.y_hi[x]);
 
-                const u8 light = sector->light;
+                const u8 light = *fulbright.string == '0' ? sector->light : 255;
 
                 // floor
                 if (yf > render_state.y_lo[x]) {
