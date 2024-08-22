@@ -20,7 +20,7 @@ void R_RenderCameraView(camera_t* camera, map_t* map) {
     }
 
     // track if sector has already been drawn
-    bool portdraw[256];
+    u8 portdraw[256];
     memset(portdraw, 0, sizeof(portdraw));
 
     // calculate edges of near/far planes (looking down +Y axis)
@@ -53,8 +53,8 @@ void R_RenderCameraView(camera_t* camera, map_t* map) {
             const wall_t* wall =
                 &map->walls.arr[sector->firstwall + i];
 
-            if (portdraw[sector->firstwall + i]) continue;
-            portdraw[sector->firstwall + i] = true;
+            if (portdraw[sector->firstwall + i] == 3) continue;
+            portdraw[sector->firstwall + i]++;                     
 
             // translate relative to player and rotate points around player's view
             const v2 cam_pos = (v2) { camera->obj.pos.x, camera->obj.pos.y };
