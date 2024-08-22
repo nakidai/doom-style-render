@@ -18,6 +18,7 @@ extern vidstate_t   video_state;  // link video state
 
 cmd_var_t console_black_out =    { "con_blackout",     "", 32, 0.f };
 cmd_var_t console_input_prefix = { "con_input_prefix", "] ", 0, 0.f };
+cmd_var_t console_print_errors = { "con_print_errors", "0", 0, 0.f };
 
 // init console
 void CON_Init(void) {
@@ -25,6 +26,7 @@ void CON_Init(void) {
 
     CMD_AddVariable(&console_black_out);
     CMD_AddVariable(&console_input_prefix);
+    CMD_AddVariable(&console_print_errors);
 
     CON_Printf("console init done!\n"); // print done to console
     CON_Printf(console_input_prefix.string);
@@ -72,20 +74,22 @@ static void CON_Exec(void) {
 
     // execute command
     int ret = CMD_ExecuteText(con_in);
-    switch (ret) {
-        case CE_NOT_FOUND:
-            CON_Printf("\nCommand not found!");
-            break;
+    if (*console_print_errors.string != '0') {
+        switch (ret) {
+            case CE_NOT_FOUND:
+                CON_Printf("\nCommand not found!");
+                break;
 
-        case CE_COMMAND_ERROR:
-            CON_Printf("\nCommand error!");
-            break;
+            case CE_COMMAND_ERROR:
+                CON_Printf("\nCommand error!");
+                break;
 
-        case CE_SUCCESS:
-        case CE_VARIABLE:
-        case CE_COMMENT:
-        default:
-            break;
+            case CE_SUCCESS:
+            case CE_VARIABLE:
+            case CE_COMMENT:
+            default:
+                break;
+        }
     }
 
     // free console input buffer
