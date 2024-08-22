@@ -2,3 +2,4 @@ build/
 SDL2_ttf/
 
 *.bak
+*.log
