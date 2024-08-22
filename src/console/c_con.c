@@ -16,9 +16,9 @@ static char con_in[32];    // console input buffer
 
 extern vidstate_t   video_state;  // link video state
 
-cmd_var_t console_black_out =    { "con_blackout",     "", 32, 0.f };
-cmd_var_t console_input_prefix = { "con_input_prefix", "] ", 0, 0.f };
-cmd_var_t console_print_errors = { "con_print_errors", "0", 0, 0.f };
+static cmd_var_t console_black_out =    { "con_blackout",     "", 32, 0.f };
+static cmd_var_t console_input_prefix = { "con_input_prefix", "] ", 0, 0.f };
+static cmd_var_t console_print_errors = { "con_print_errors", "0", 0, 0.f };
 
 // init console
 void CON_Init(void) {
