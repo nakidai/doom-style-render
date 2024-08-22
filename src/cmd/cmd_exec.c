@@ -25,11 +25,13 @@ static usize      cmd_var_len = 0; // count of variables
 // builtin console commands
 int CMD_Echo(char* args);
 int CMD_ExecCommand(char* args);
+int CMD_Alias(char* args);
 
 // init builtin console commands
 void CMD_Init(void) {
-    CMD_AddCommand("echo", &CMD_Echo);
-    CMD_AddCommand("exec", &CMD_ExecCommand);
+    CMD_AddCommand("echo",  &CMD_Echo);
+    CMD_AddCommand("exec",  &CMD_ExecCommand);
+    CMD_AddCommand("alias", &CMD_Alias);
 }
 
 // add new command
@@ -125,4 +127,11 @@ int CMD_ExecCommand(char* args) {
     fclose(file); // close file
     
     return CE_SUCCESS;
+}
+
+// alias command
+int CMD_Alias(char* args) {
+    for (char* command = strtok_r(args, ";", &args); command != NULL; command = strtok_r(NULL, ";", &args)) {
+        CMD_ExecuteText(command);
+    }
 }
